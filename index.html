@@ -39,13 +39,12 @@
             <label>Nome<input type="text" id="regName" required placeholder="Seu nome"></label>
             <label>E-mail<input type="email" id="regEmail" required placeholder="seuemail@email.com"></label>
             <label>Senha<input type="password" id="regPassword" required minlength="4" placeholder="Mínimo 4 caracteres"></label>
-            <label>Tipo de conta
-              <select id="regRole">
-                <option value="user">Usuário que assiste</option>
-                <option value="advertiser">Anunciante</option>
-                <option value="admin">Admin teste</option>
-              </select>
-            </label>
+            <div class="role-box">
+              <p>Tipo de conta</p>
+              <label class="checkline"><input type="checkbox" id="regAsUser" checked> Quero assistir vídeos e ganhar pontos</label>
+              <label class="checkline"><input type="checkbox" id="regAsAdvertiser"> Também quero anunciar meus produtos</label>
+              <small>Uma conta pode ser apenas usuário ou usuário + anunciante. Admin é separado para segurança.</small>
+            </div>
             <button type="submit" class="primary">Criar conta</button>
           </form>
         </div>
@@ -83,7 +82,22 @@
       <section id="advertiserScreen" class="screen">
         <div class="card">
           <h2>Painel do anunciante</h2>
-          <p>Cadastre campanhas com vídeo, link de produto e orçamento.</p>
+          <p>Cadastre produtos na loja interna e campanhas com vídeo, orçamento e botão de compra dentro do app.</p>
+          <div class="shop-box full">
+            <h3>Minha Loja AssistaPay</h3>
+            <p>Cadastre produtos para vender dentro do app e permitir afiliados.</p>
+            <form id="productForm" class="grid-form nested-form">
+              <label>Nome do produto<input id="prodName" required placeholder="Ex: Fone Bluetooth X9"></label>
+              <label>Preço R$<input id="prodPrice" type="number" min="1" step="0.01" required placeholder="79.90"></label>
+              <label>Comissão do afiliado %<input id="prodCommission" type="number" min="0" max="80" step="1" value="10"></label>
+              <label>Estoque<input id="prodStock" type="number" min="0" step="1" value="100"></label>
+              <label class="full">Link externo de checkout, opcional<input id="prodCheckout" placeholder="Opcional: Mercado Livre, Amazon, Shopee, loja própria..."></label>
+              <label class="full">Descrição<textarea id="prodDesc" placeholder="Descrição do produto, benefício e garantia"></textarea></label>
+              <button class="secondary full" type="submit">Cadastrar produto na loja</button>
+            </form>
+            <div id="advertiserProducts" class="cards-list shop-list"></div>
+          </div>
+
           <form id="campaignForm" class="grid-form">
             <label>Título<input id="campTitle" required placeholder="Ex: Fone Bluetooth promoção"></label>
             <label>Categoria<select id="campCategory"></select></label>
@@ -98,7 +112,8 @@
               </label>
               <div id="creativePreview" class="creative-preview hidden"></div>
             </div>
-            <label>Link do produto<input id="campLink" required placeholder="https://..."></label>
+            <label class="full">Produto da loja interna<select id="campProductId"><option value="external">Usar link externo / sem produto interno</option></select></label>
+            <label>Link externo do produto<input id="campLink" placeholder="https://... (opcional se escolher produto interno)"></label>
             <label>Texto do botão do produto<input id="campCtaText" maxlength="28" placeholder="Ex: Comprar agora, Ver oferta, Nome do produto"></label>
             <label>Orçamento R$<input id="campBudget" type="number" min="10" step="1" required placeholder="100"></label>
             <label>Pontos por view<input id="campPoints" type="number" min="1" max="20" value="5"></label>
@@ -110,6 +125,15 @@
         </div>
         <h2 class="section-title">Minhas campanhas</h2>
         <div id="advertiserCampaigns" class="cards-list"></div>
+      </section>
+
+      <section id="marketScreen" class="screen">
+        <div class="card">
+          <h2>Marketplace AssistaPay Shop</h2>
+          <p>Produtos cadastrados dentro da plataforma. O usuário pode comprar ou se afiliar quando o produto permitir comissão.</p>
+          <div class="searchbar"><input id="marketSearch" type="search" placeholder="Pesquisar produto na loja..."><select id="marketCategory"><option value="all">Todas categorias</option></select></div>
+        </div>
+        <div id="marketProducts" class="product-grid"></div>
       </section>
 
       <section id="adminScreen" class="screen">
@@ -130,10 +154,17 @@
     </main>
 
     <nav id="bottomNav" class="bottom-nav hidden">
-      <button data-go="userScreen">Feed</button>
-      <button data-go="advertiserScreen">Anunciar</button>
-      <button data-go="adminScreen">Admin</button>
+      <button id="navFeed" data-go="userScreen">Feed</button>
+      <button id="navShop" data-go="marketScreen">Shop</button>
+      <button id="navAdvertiser" data-go="advertiserScreen">Anunciar</button>
+      <button id="navAdmin" data-go="adminScreen">Admin</button>
     </nav>
+  </div>
+  <div id="productModal" class="modal hidden">
+    <div class="modal-card">
+      <button id="closeProductModal" class="modal-close">×</button>
+      <div id="productModalContent"></div>
+    </div>
   </div>
   <script src="app.js"></script>
 </body>
