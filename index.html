@@ -51,27 +51,33 @@
         </div>
       </section>
 
-      <section id="userScreen" class="screen">
-        <div class="stats-grid">
-          <div class="card stat"><small>Pontos</small><strong id="userPoints">0</strong></div>
-          <div class="card stat"><small>Saldo</small><strong id="userBalance">R$ 0,00</strong></div>
-          <div class="card stat"><small>Nível</small><strong id="userLevel">Bronze</strong></div>
+      <section id="userScreen" class="screen tiktok-screen">
+        <div class="feed-top-overlay">
+          <div>
+            <b>AssistaPay</b>
+            <small>Para você</small>
+          </div>
+          <button id="openSearchBtn" class="round-btn">🔎</button>
         </div>
 
-        <div class="searchbar card">
-          <input id="searchInput" type="search" placeholder="Pesquisar vídeos ou produtos..." />
-          <select id="categoryFilter"><option value="all">Todas categorias</option></select>
+        <div id="userPanel" class="user-panel hidden">
+          <div class="stats-grid compact-stats">
+            <div class="stat"><small>Pontos</small><strong id="userPoints">0</strong></div>
+            <div class="stat"><small>Saldo</small><strong id="userBalance">R$ 0,00</strong></div>
+            <div class="stat"><small>Nível</small><strong id="userLevel">Bronze</strong></div>
+          </div>
+          <div class="searchbar">
+            <input id="searchInput" type="search" placeholder="Pesquisar vídeos ou produtos..." />
+            <select id="categoryFilter"><option value="all">Todas categorias</option></select>
+          </div>
+          <div class="wallet-mini">
+            <p>1000 pontos = R$ 1,00 · Saque mínimo R$ 20,00</p>
+            <div class="row"><input id="pixKey" placeholder="Chave Pix"><button id="withdrawBtn" class="secondary">Sacar</button></div>
+            <small id="withdrawMsg"></small>
+          </div>
         </div>
 
-        <div class="wallet card">
-          <h3>Carteira</h3>
-          <p>Conversão: <b>1000 pontos = R$ 1,00</b>. Saque mínimo: <b>R$ 20,00</b>.</p>
-          <div class="row"><input id="pixKey" placeholder="Chave Pix para saque"><button id="withdrawBtn" class="secondary">Solicitar saque</button></div>
-          <small id="withdrawMsg"></small>
-        </div>
-
-        <h2 class="section-title">Feed inteligente</h2>
-        <div id="videoFeed" class="feed"></div>
+        <div id="videoFeed" class="feed reels-feed"></div>
       </section>
 
       <section id="advertiserScreen" class="screen">
@@ -81,7 +87,17 @@
           <form id="campaignForm" class="grid-form">
             <label>Título<input id="campTitle" required placeholder="Ex: Fone Bluetooth promoção"></label>
             <label>Categoria<select id="campCategory"></select></label>
-            <label>URL do vídeo<input id="campVideo" required placeholder="Link .mp4 ou vídeo de teste"></label>
+            <div class="creative-picker full">
+              <h3>Criativo da campanha</h3>
+              <p>Envie um vídeo ou imagem vertical 9:16. Se não tiver arquivo, use uma URL externa.</p>
+              <label>Upload de vídeo ou imagem
+                <input id="campCreativeFile" type="file" accept="video/mp4,video/webm,image/png,image/jpeg,image/webp">
+              </label>
+              <label>Ou URL do criativo
+                <input id="campVideo" placeholder="Link .mp4, .webm, .jpg, .png ou imagem/vídeo de teste">
+              </label>
+              <div id="creativePreview" class="creative-preview hidden"></div>
+            </div>
             <label>Link do produto<input id="campLink" required placeholder="https://..."></label>
             <label>Orçamento R$<input id="campBudget" type="number" min="10" step="1" required placeholder="100"></label>
             <label>Pontos por view<input id="campPoints" type="number" min="1" max="20" value="5"></label>
