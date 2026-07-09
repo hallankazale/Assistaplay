@@ -19,7 +19,7 @@ function loadDB(){
       {id:'adv1', name:'Anunciante Teste', email:'anunciante@teste.com', password:'1234', role:'advertiser', points:0, interests:{}}
     ],
     campaigns: [
-      {id:'camp1', advertiserId:'adv1', title:'Produto teste: oferta especial', desc:'Campanha exemplo com link de produto.', category:'Tecnologia', videoUrl:sampleVideo, creativeType:'video', productLink:'https://www.mercadolivre.com.br', budget:100, rewardReserve:50, platformProfit:25, safetyReserve:15, costs:10, pointsPerView:5, question:'Qual tipo de conteúdo apareceu?', answer:'flor', status:'active', metrics:{views:0,likes:0,shares:0,clicks:0,completions:0}}
+      {id:'camp1', advertiserId:'adv1', title:'Produto teste: oferta especial', desc:'Campanha exemplo com link de produto.', category:'Tecnologia', videoUrl:sampleVideo, creativeType:'video', productLink:'https://www.mercadolivre.com.br', ctaText:'Ver oferta', budget:100, rewardReserve:50, platformProfit:25, safetyReserve:15, costs:10, pointsPerView:5, question:'Qual tipo de conteúdo apareceu?', answer:'flor', status:'active', metrics:{views:0,likes:0,shares:0,clicks:0,completions:0}}
     ],
     views: [], likes: [], shares: [], clicks: [], withdrawals: []
   };
@@ -128,8 +128,8 @@ function videoCard(c){
         <p>${desc}</p>
       </div>
 
-      <a class="product-float productBtn" href="${escapeHtml(c.productLink)}" target="_blank" rel="noopener" title="Ver produto">
-        <span class="cart-icon">🛒</span><span>Ver produto</span>
+      <a class="product-float productBtn" href="${escapeHtml(c.productLink)}" target="_blank" rel="noopener" title="${escapeHtml(c.ctaText || 'Ver produto')}">
+        <span class="cart-icon">🛒</span><span>${escapeHtml(c.ctaText || 'Ver produto')}</span>
       </a>
 
       <div class="side-actions">
@@ -214,7 +214,7 @@ $('#campaignForm').onsubmit = async e=>{
     creativeType = file.type.startsWith('image/') ? 'image' : 'video';
   }
   if(!creativeUrl) return toast('Envie um vídeo/imagem ou informe uma URL do criativo.');
-  const c = {id:uid(), advertiserId:u.id, title:$('#campTitle').value, desc:$('#campDesc').value, category:$('#campCategory').value, videoUrl:creativeUrl, creativeType, productLink:$('#campLink').value, budget, rewardReserve:budget*.5, platformProfit:budget*.25, safetyReserve:budget*.15, costs:budget*.10, pointsPerView:Number($('#campPoints').value), question:$('#campQuestion').value, answer:$('#campAnswer').value, status:'pending', metrics:{views:0,likes:0,shares:0,clicks:0,completions:0}};
+  const c = {id:uid(), advertiserId:u.id, title:$('#campTitle').value, desc:$('#campDesc').value, category:$('#campCategory').value, videoUrl:creativeUrl, creativeType, productLink:$('#campLink').value, ctaText:($('#campCtaText').value.trim() || 'Ver produto'), budget, rewardReserve:budget*.5, platformProfit:budget*.25, safetyReserve:budget*.15, costs:budget*.10, pointsPerView:Number($('#campPoints').value), question:$('#campQuestion').value, answer:$('#campAnswer').value, status:'pending', metrics:{views:0,likes:0,shares:0,clicks:0,completions:0}};
   db.campaigns.push(c); saveDB(db); e.target.reset(); $('#creativePreview').classList.add('hidden'); $('#creativePreview').innerHTML=''; renderAll(); toast('Campanha cadastrada. Agora precisa aprovação do admin.');
 };
 function renderAdvertiser(){
