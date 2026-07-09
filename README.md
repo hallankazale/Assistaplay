@@ -24,3 +24,9 @@ Contas de teste:
 
 ## Observação
 Esta versão usa localStorage, ou seja, salva os dados no próprio navegador. Para produção, trocar por Firebase/Supabase e criar regras de segurança.
+
+
+## Versão consolidada
+- Tela inicial elegante restaurada.
+- Layout premium interno mantido.
+- A partir desta versão, cada atualização deve preservar melhorias anteriores.
