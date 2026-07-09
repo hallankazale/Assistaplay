@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AssistaPay</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">▶</span>
+        <div>
+          <h1>AssistaPay</h1>
+          <small>Vídeos que recompensam</small>
+        </div>
+      </div>
+      <button id="logoutBtn" class="ghost hidden">Sair</button>
+    </header>
+
+    <main>
+      <section id="authScreen" class="screen active">
+        <div class="hero card">
+          <h2>Assista vídeos, descubra produtos e acumule pontos</h2>
+          <p>Uma plataforma de anúncios recompensados com controle financeiro para não pagar mais do que as campanhas recebem.</p>
+          <div class="tabs">
+            <button class="tab active" data-auth="login">Entrar</button>
+            <button class="tab" data-auth="register">Criar conta</button>
+          </div>
+
+          <form id="loginForm" class="auth-form">
+            <label>E-mail<input type="email" id="loginEmail" required placeholder="seuemail@email.com"></label>
+            <label>Senha<input type="password" id="loginPassword" required placeholder="Digite sua senha"></label>
+            <button type="submit" class="primary">Entrar</button>
+          </form>
+
+          <form id="registerForm" class="auth-form hidden">
+            <label>Nome<input type="text" id="regName" required placeholder="Seu nome"></label>
+            <label>E-mail<input type="email" id="regEmail" required placeholder="seuemail@email.com"></label>
+            <label>Senha<input type="password" id="regPassword" required minlength="4" placeholder="Mínimo 4 caracteres"></label>
+            <label>Tipo de conta
+              <select id="regRole">
+                <option value="user">Usuário que assiste</option>
+                <option value="advertiser">Anunciante</option>
+                <option value="admin">Admin teste</option>
+              </select>
+            </label>
+            <button type="submit" class="primary">Criar conta</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="userScreen" class="screen">
+        <div class="stats-grid">
+          <div class="card stat"><small>Pontos</small><strong id="userPoints">0</strong></div>
+          <div class="card stat"><small>Saldo</small><strong id="userBalance">R$ 0,00</strong></div>
+          <div class="card stat"><small>Nível</small><strong id="userLevel">Bronze</strong></div>
+        </div>
+
+        <div class="searchbar card">
+          <input id="searchInput" type="search" placeholder="Pesquisar vídeos ou produtos..." />
+          <select id="categoryFilter"><option value="all">Todas categorias</option></select>
+        </div>
+
+        <div class="wallet card">
+          <h3>Carteira</h3>
+          <p>Conversão: <b>1000 pontos = R$ 1,00</b>. Saque mínimo: <b>R$ 20,00</b>.</p>
+          <div class="row"><input id="pixKey" placeholder="Chave Pix para saque"><button id="withdrawBtn" class="secondary">Solicitar saque</button></div>
+          <small id="withdrawMsg"></small>
+        </div>
+
+        <h2 class="section-title">Feed inteligente</h2>
+        <div id="videoFeed" class="feed"></div>
+      </section>
+
+      <section id="advertiserScreen" class="screen">
+        <div class="card">
+          <h2>Painel do anunciante</h2>
+          <p>Cadastre campanhas com vídeo, link de produto e orçamento.</p>
+          <form id="campaignForm" class="grid-form">
+            <label>Título<input id="campTitle" required placeholder="Ex: Fone Bluetooth promoção"></label>
+            <label>Categoria<select id="campCategory"></select></label>
+            <label>URL do vídeo<input id="campVideo" required placeholder="Link .mp4 ou vídeo de teste"></label>
+            <label>Link do produto<input id="campLink" required placeholder="https://..."></label>
+            <label>Orçamento R$<input id="campBudget" type="number" min="10" step="1" required placeholder="100"></label>
+            <label>Pontos por view<input id="campPoints" type="number" min="1" max="20" value="5"></label>
+            <label class="full">Descrição<textarea id="campDesc" placeholder="Fale sobre o produto"></textarea></label>
+            <label class="full">Pergunta antifraude<input id="campQuestion" placeholder="Ex: Qual produto apareceu no vídeo?"></label>
+            <label>Resposta correta<input id="campAnswer" placeholder="Ex: Fone"></label>
+            <button class="primary full" type="submit">Cadastrar campanha</button>
+          </form>
+        </div>
+        <h2 class="section-title">Minhas campanhas</h2>
+        <div id="advertiserCampaigns" class="cards-list"></div>
+      </section>
+
+      <section id="adminScreen" class="screen">
+        <div class="card">
+          <h2>Painel Admin</h2>
+          <p>Aprove campanhas, veja reservas e solicitações de saque.</p>
+          <div class="stats-grid">
+            <div class="stat"><small>Campanhas</small><strong id="adminCampaignCount">0</strong></div>
+            <div class="stat"><small>Reserva recompensas</small><strong id="adminRewardReserve">R$ 0,00</strong></div>
+            <div class="stat"><small>Lucro plataforma</small><strong id="adminProfit">R$ 0,00</strong></div>
+          </div>
+        </div>
+        <h2 class="section-title">Campanhas pendentes/ativas</h2>
+        <div id="adminCampaigns" class="cards-list"></div>
+        <h2 class="section-title">Saques</h2>
+        <div id="adminWithdrawals" class="cards-list"></div>
+      </section>
+    </main>
+
+    <nav id="bottomNav" class="bottom-nav hidden">
+      <button data-go="userScreen">Feed</button>
+      <button data-go="advertiserScreen">Anunciar</button>
+      <button data-go="adminScreen">Admin</button>
+    </nav>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
