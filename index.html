@@ -81,12 +81,15 @@
       </section>
 
       <section id="userScreen" class="screen tiktok-screen">
-        <div class="feed-top-overlay">
+        <div class="feed-top-overlay premium-feed-head">
           <div>
             <b>AssistaPay</b>
-            <small>Para você</small>
+            <small id="feedModeLabel">Para você</small>
           </div>
-          <button id="openSearchBtn" class="round-btn">🔎</button>
+          <div class="feed-head-actions">
+            <button id="buyModeBtn" class="pill-toggle" type="button">🛍 Comprar</button>
+            <button id="openSearchBtn" class="round-btn">🔎</button>
+          </div>
         </div>
 
         <div id="userPanel" class="user-panel hidden">
@@ -113,6 +116,7 @@
         <div class="card">
           <h2>Painel do anunciante</h2>
           <p>Cadastre produtos na loja interna e campanhas com vídeo, orçamento e botão de compra dentro do app.</p>
+          <div id="advertiserKpis" class="shop-kpi"></div>
           <div class="shop-box full">
             <h3>Minha Loja AssistaPay</h3>
             <p>Cadastre produtos para vender dentro do app e permitir afiliados.</p>
@@ -166,6 +170,48 @@
         <div id="marketProducts" class="product-grid"></div>
       </section>
 
+
+      <section id="walletScreen" class="screen">
+        <div class="wallet-hero card">
+          <span class="badge">Carteira AssistaPay</span>
+          <h2 id="walletBalanceBig">R$ 0,00</h2>
+          <p>Saldo estimado pelos pontos. Saques passam por revisão manual para proteger o sistema contra fraude.</p>
+          <div class="stats-grid">
+            <div class="stat"><small>Pontos</small><strong id="walletPoints">0</strong></div>
+            <div class="stat"><small>Ganhos hoje</small><strong id="walletToday">0 pts</strong></div>
+            <div class="stat"><small>Nível</small><strong id="walletLevel">Bronze</strong></div>
+          </div>
+          <div class="wallet-withdraw">
+            <input id="walletPixKey" placeholder="Chave Pix para saque">
+            <button id="walletWithdrawBtn" class="primary">Solicitar Pix</button>
+            <small id="walletWithdrawMsg"></small>
+          </div>
+        </div>
+        <h2 class="section-title">Extrato recente</h2>
+        <div id="walletExtract" class="cards-list"></div>
+      </section>
+
+      <section id="profileScreen" class="screen">
+        <div class="profile-card card">
+          <div class="avatar-big" id="profileAvatar">AP</div>
+          <div>
+            <span class="badge" id="profileRoles">Usuário</span>
+            <h2 id="profileName">Meu perfil</h2>
+            <p id="profileEmail">email</p>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat"><small>Nível</small><strong id="profileLevel">Bronze</strong></div>
+          <div class="stat"><small>Compras</small><strong id="profileOrders">0</strong></div>
+          <div class="stat"><small>Interesses</small><strong id="profileTopInterest">-</strong></div>
+        </div>
+        <div class="card">
+          <h2>Meu algoritmo</h2>
+          <p>O sistema usa suas curtidas, buscas, visualizações, cliques e compras para mostrar vídeos mais relevantes.</p>
+          <div id="interestBars" class="interest-bars"></div>
+        </div>
+      </section>
+
       <section id="adminScreen" class="screen">
         <div class="card">
           <h2>Painel Admin</h2>
@@ -184,10 +230,12 @@
     </main>
 
     <nav id="bottomNav" class="bottom-nav hidden">
-      <button id="navFeed" data-go="userScreen">Feed</button>
-      <button id="navShop" data-go="marketScreen">Shop</button>
-      <button id="navAdvertiser" data-go="advertiserScreen">Anunciar</button>
-      <button id="navAdmin" data-go="adminScreen">Admin</button>
+      <button id="navFeed" data-go="userScreen"><span>🏠</span><small>Início</small></button>
+      <button id="navShop" data-go="marketScreen"><span>🛍</span><small>Shop</small></button>
+      <button id="navAdvertiser" data-go="advertiserScreen"><span>📊</span><small>Painel</small></button>
+      <button id="navWallet" data-go="walletScreen"><span>💰</span><small>Carteira</small></button>
+      <button id="navProfile" data-go="profileScreen"><span>👤</span><small>Perfil</small></button>
+      <button id="navAdmin" data-go="adminScreen"><span>🛡</span><small>Admin</small></button>
     </nav>
   </div>
   <div id="productModal" class="modal hidden">

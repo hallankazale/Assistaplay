@@ -3,7 +3,7 @@ const POINTS_TO_BRL = 1000;
 const MIN_WITHDRAW_BRL = 20;
 const LS_KEY = 'assistapay_db_v3_shop';
 let currentUserId = localStorage.getItem('assistapay_current_user') || null;
-let selectedEntryProfile = localStorage.getItem('assistapay_entry_profile') || 'user';
+let buyModeOnly = false;
 
 const sampleVideo = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
 
@@ -39,11 +39,9 @@ function rolesOf(u){
 }
 function hasRole(role){ return rolesOf(user()).includes(role); }
 function firstAllowedScreen(){
-  if(selectedEntryProfile === 'advertiser' && hasRole('advertiser')) return 'advertiserScreen';
-  if(selectedEntryProfile === 'user' && hasRole('user')) return 'userScreen';
   if(hasRole('admin')) return 'adminScreen';
-  if(hasRole('advertiser')) return 'advertiserScreen';
   if(hasRole('user')) return 'userScreen';
+  if(hasRole('advertiser')) return 'advertiserScreen';
   return 'authScreen';
 }
 function updateNavPermissions(){
@@ -55,11 +53,15 @@ function updateNavPermissions(){
   $('#navShop').classList.toggle('hidden', !hasRole('user') && !hasRole('advertiser') && !hasRole('admin'));
   $('#navAdvertiser').classList.toggle('hidden', !hasRole('advertiser') && !hasRole('admin'));
   $('#navAdmin').classList.toggle('hidden', !hasRole('admin'));
+  $('#navWallet')?.classList.toggle('hidden', !hasRole('user') && !hasRole('admin'));
+  $('#navProfile')?.classList.toggle('hidden', !logged);
 }
 function canAccessScreen(id){
   if(id==='userScreen') return hasRole('user') || hasRole('admin');
   if(id==='marketScreen') return hasRole('user') || hasRole('advertiser') || hasRole('admin');
   if(id==='advertiserScreen') return hasRole('advertiser') || hasRole('admin');
+  if(id==='walletScreen') return hasRole('user') || hasRole('admin');
+  if(id==='profileScreen') return !!user();
   if(id==='adminScreen') return hasRole('admin');
   return true;
 }
@@ -109,30 +111,11 @@ $$('.tab').forEach(btn=>btn.onclick=()=>{
   $('#registerForm').classList.toggle('hidden', mode!=='register');
 });
 
-function setEntryProfile(profile){
-  selectedEntryProfile = profile;
-  localStorage.setItem('assistapay_entry_profile', profile);
-  $$('.entry-card').forEach(card=>card.classList.toggle('active', card.dataset.entry===profile));
-  const asAdvertiser = profile === 'advertiser';
-  if($('#regAsUser')) $('#regAsUser').checked = true;
-  if($('#regAsAdvertiser')) $('#regAsAdvertiser').checked = asAdvertiser;
-  const title = $('#loginEmail');
-  if(title){
-    title.placeholder = asAdvertiser ? 'email do anunciante' : 'seuemail@email.com';
-  }
-}
-$$('.entry-card').forEach(card=>card.onclick=()=>setEntryProfile(card.dataset.entry));
-setEntryProfile(selectedEntryProfile);
-
 $('#loginForm').onsubmit = e => {
   e.preventDefault();
   const email = $('#loginEmail').value.trim().toLowerCase(); const pass = $('#loginPassword').value;
   const found = db.users.find(u=>u.email===email && u.password===pass);
   if(!found) return toast('E-mail ou senha inválidos. Teste: user@teste.com / 1234');
-  const foundRoles = Array.isArray(found.roles) ? found.roles : (found.role ? [found.role] : ['user']);
-  if(selectedEntryProfile === 'advertiser' && !foundRoles.includes('advertiser') && !foundRoles.includes('admin')){
-    return toast('Essa conta não tem perfil de anunciante. Entre como usuário comum ou crie uma conta de anunciante.');
-  }
   currentUserId = found.id; localStorage.setItem('assistapay_current_user', currentUserId); authUI();
 };
 $('#registerForm').onsubmit = e => {
@@ -140,8 +123,8 @@ $('#registerForm').onsubmit = e => {
   const email = $('#regEmail').value.trim().toLowerCase();
   if(db.users.some(u=>u.email===email)) return toast('Este e-mail já existe.');
   const roles = [];
-  if($('#regAsUser').checked || selectedEntryProfile === 'advertiser') roles.push('user');
-  if($('#regAsAdvertiser').checked || selectedEntryProfile === 'advertiser') roles.push('advertiser');
+  if($('#regAsUser').checked) roles.push('user');
+  if($('#regAsAdvertiser').checked) roles.push('advertiser');
   if(!roles.length) roles.push('user');
   const newUser = {id:uid(), name:$('#regName').value.trim(), email, password:$('#regPassword').value, roles, points:0, interests:{}};
   db.users.push(newUser); saveDB(db); currentUserId = newUser.id; localStorage.setItem('assistapay_current_user', currentUserId); authUI();
@@ -153,6 +136,7 @@ $('#bottomNav').onclick = e => {
   showScreen(e.target.dataset.go); renderAll();
 };
 $('#openSearchBtn')?.addEventListener('click', ()=> $('#userPanel').classList.toggle('hidden'));
+$('#buyModeBtn')?.addEventListener('click', ()=>{ buyModeOnly=!buyModeOnly; renderFeed(); });
 
 
 function level(points){ if(points>=10000) return 'Diamante'; if(points>=5000) return 'Ouro'; if(points>=2000) return 'Prata'; return 'Bronze'; }
@@ -171,7 +155,10 @@ function campaignScore(c){
 }
 function renderFeed(){
   const q = $('#searchInput').value.toLowerCase(); const cat = $('#categoryFilter').value;
+  $('#feedModeLabel') && ($('#feedModeLabel').textContent = buyModeOnly ? 'Modo Comprar' : 'Para você');
+  $('#buyModeBtn') && $('#buyModeBtn').classList.toggle('active', buyModeOnly);
   let campaigns = db.campaigns.filter(c=>c.status==='active' && c.rewardReserve > 0);
+  if(buyModeOnly) campaigns = campaigns.filter(c=>!!c.productId);
   campaigns = campaigns.filter(c => { const p=getProduct(c.productId); return (cat==='all'||c.category===cat) && (`${c.title} ${c.desc} ${c.category} ${p?.name||''}`.toLowerCase().includes(q)); });
   campaigns.sort((a,b)=>campaignScore(b)-campaignScore(a));
   $('#videoFeed').innerHTML = campaigns.map(c=>videoCard(c)).join('') || '<div class="empty-reels">Nenhum vídeo encontrado.<br>Toque na lupa para mudar a busca.</div>';
@@ -190,13 +177,14 @@ function videoCard(c){
       <div class="progress-pill">${already?'✅ Já pontuado':`🎯 Vale ${c.pointsPerView} pontos`}</div>
 
       <div class="reel-info">
+        <span class="store-name"><span class="verified">●</span> ${escapeHtml(db.users.find(u=>u.id===c.advertiserId)?.name || 'Loja AssistaPay')}</span>
         <span class="badge">${cat}</span>
         <h3>${title}</h3>
         <p>${desc}</p>
       </div>
 
       <button class="product-float productBtn" title="${escapeHtml(c.ctaText || 'Ver produto')}">
-        <span class="cart-icon">🛒</span><span>${escapeHtml(c.ctaText || (c.productId ? 'Ver produto' : 'Ver oferta'))}</span>
+        <span class="cart-icon">🛒</span><span>${escapeHtml(c.ctaText || (c.productId ? 'Ver produto' : 'Ver oferta'))}${getProduct(c.productId)?.price ? `<em class="product-price-mini">${money(getProduct(c.productId).price)}</em>` : ''}</span>
       </button>
 
       <div class="side-actions">
@@ -249,13 +237,15 @@ feedEl?.addEventListener('scroll', ()=> requestAnimationFrame(autoPlayVisible));
 
 $('#searchInput').oninput = renderFeed; $('#categoryFilter').onchange = renderFeed;
 
-$('#withdrawBtn').onclick = ()=>{
-  const u = user(); const balance = (u.points||0)/POINTS_TO_BRL; const pix = $('#pixKey').value.trim();
-  if(balance < MIN_WITHDRAW_BRL) return $('#withdrawMsg').textContent = 'Saldo insuficiente para saque.';
-  if(!pix) return $('#withdrawMsg').textContent = 'Informe sua chave Pix.';
+function requestWithdraw(pixSelector,msgSelector){
+  const u = user(); const balance = (u.points||0)/POINTS_TO_BRL; const pix = $(pixSelector).value.trim(); const msg=$(msgSelector);
+  if(balance < MIN_WITHDRAW_BRL) return msg.textContent = 'Saldo insuficiente para saque.';
+  if(!pix) return msg.textContent = 'Informe sua chave Pix.';
   db.withdrawals.push({id:uid(), userId:u.id, userName:u.name, pix, amount:balance, points:u.points, status:'pending', createdAt:new Date().toLocaleString('pt-BR')});
-  u.points = 0; saveDB(db); $('#withdrawMsg').textContent = 'Solicitação enviada para análise manual.'; renderAll();
-};
+  u.points = 0; saveDB(db); msg.textContent = 'Solicitação enviada para análise manual.'; renderAll();
+}
+$('#withdrawBtn').onclick = ()=> requestWithdraw('#pixKey','#withdrawMsg');
+$('#walletWithdrawBtn') && ($('#walletWithdrawBtn').onclick = ()=> requestWithdraw('#walletPixKey','#walletWithdrawMsg'));
 
 $('#campCreativeFile')?.addEventListener('change', async e=>{
   const file = e.target.files?.[0];
@@ -382,6 +372,8 @@ $('#campaignForm').onsubmit = async e=>{
 function renderAdvertiser(){
   const u = user(); if(!u || (!hasRole('advertiser') && !hasRole('admin'))) return;
   const mine = hasRole('admin') ? db.campaigns : db.campaigns.filter(c=>c.advertiserId===u.id);
+  const k=$('#advertiserKpis');
+  if(k){ const views=mine.reduce((s,c)=>s+(c.metrics?.views||0),0), clicks=mine.reduce((s,c)=>s+(c.metrics?.clicks||0),0), sales=db.orders.filter(o=>mine.some(c=>c.id===o.campaignId)).length, budget=mine.reduce((s,c)=>s+Number(c.budget||0),0); k.innerHTML=`<div><small>Investido</small><b>${money(budget)}</b></div><div><small>Views</small><b>${views}</b></div><div><small>Cliques</small><b>${clicks}</b></div><div><small>Vendas</small><b>${sales}</b></div>`; }
   $('#advertiserCampaigns').innerHTML = mine.map(c=>miniCampaign(c,false)).join('') || '<div class="card">Nenhuma campanha ainda.</div>';
 }
 function miniCampaign(c,admin){
@@ -397,5 +389,35 @@ function renderAdmin(){
   $('#adminWithdrawals').innerHTML = db.withdrawals.map(w=>`<div class="mini-card"><h3>${w.userName}</h3><p>Valor: ${money(w.amount)} | Pix: ${w.pix}</p><p>Status: <b>${w.status}</b> | ${w.createdAt}</p><div class="actions"><button class="ok" onclick="setWithdraw('${w.id}','approved')">Aprovar</button><button class="danger" onclick="setWithdraw('${w.id}','rejected')">Recusar</button></div></div>`).join('') || '<div class="card">Nenhum saque solicitado.</div>';
 }
 window.setWithdraw = (id,status)=>{ const w=db.withdrawals.find(x=>x.id===id); w.status=status; saveDB(db); renderAll(); };
-function renderAll(){ renderUser(); renderProducts(); renderAdvertiser(); renderAdmin(); }
+
+function renderWallet(){
+  const u=user(); if(!u) return;
+  const pts = u.points || 0;
+  const todayPts = db.views.filter(v=>v.userId===u.id && v.date===today() && v.valid).reduce((s,v)=>s+Number(v.points||0),0);
+  $('#walletBalanceBig') && ($('#walletBalanceBig').textContent = money(pts/POINTS_TO_BRL));
+  $('#walletPoints') && ($('#walletPoints').textContent = pts);
+  $('#walletToday') && ($('#walletToday').textContent = `${todayPts} pts`);
+  $('#walletLevel') && ($('#walletLevel').textContent = level(pts));
+  const extract = $('#walletExtract');
+  if(extract){
+    const rows = db.views.filter(v=>v.userId===u.id).slice(-8).reverse();
+    extract.innerHTML = rows.map(v=>{ const c=db.campaigns.find(c=>c.id===v.campaignId); return `<div class="mini-card"><h3>+${v.points} pontos</h3><p>${escapeHtml(c?.title||'Vídeo')} · ${v.date}</p></div>`; }).join('') || '<div class="card">Nenhum ganho ainda. Assista vídeos no feed para começar.</div>';
+  }
+}
+function renderProfile(){
+  const u=user(); if(!u) return;
+  $('#profileName') && ($('#profileName').textContent = u.name || 'Meu perfil');
+  $('#profileEmail') && ($('#profileEmail').textContent = u.email || '');
+  $('#profileRoles') && ($('#profileRoles').textContent = rolesOf(u).map(r=>r==='user'?'Usuário':r==='advertiser'?'Anunciante':'Admin').join(' + '));
+  $('#profileAvatar') && ($('#profileAvatar').textContent = (u.name||'AP').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase());
+  $('#profileLevel') && ($('#profileLevel').textContent = level(u.points||0));
+  $('#profileOrders') && ($('#profileOrders').textContent = db.orders.filter(o=>o.buyerId===u.id).length);
+  const entries = Object.entries(u.interests||{}).sort((a,b)=>b[1]-a[1]);
+  $('#profileTopInterest') && ($('#profileTopInterest').textContent = entries[0]?.[0] || '-');
+  const max = Math.max(1,...entries.map(e=>e[1]));
+  const bars = $('#interestBars');
+  if(bars){ bars.innerHTML = entries.slice(0,8).map(([name,val])=>`<div class="interest-row"><b>${escapeHtml(name)}</b><div class="bar-bg"><div class="bar-fill" style="width:${Math.round(val/max*100)}%"></div></div><small>${val}</small></div>`).join('') || '<p>Interaja com vídeos para o algoritmo aprender seus gostos.</p>'; }
+}
+function renderAll(){ renderUser(); renderWallet(); renderProfile(); renderProducts(); renderAdvertiser(); renderAdmin(); }
+
 initSelects(); authUI();
