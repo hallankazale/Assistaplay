@@ -20,46 +20,63 @@
     </header>
 
     <main>
-      <section id="authScreen" class="screen active">
-        <div class="hero card">
-          <h2>Assista vídeos, descubra produtos e acumule pontos</h2>
-          <p>Uma plataforma de anúncios recompensados com controle financeiro para não pagar mais do que as campanhas recebem.</p>
-          <div class="entry-choice" id="entryChoice">
-            <button type="button" class="entry-card active" data-entry="user">
-              <span>👤</span>
-              <strong>Sou usuário comum</strong>
-              <small>Quero assistir vídeos, ver produtos e ganhar pontos.</small>
-            </button>
-            <button type="button" class="entry-card" data-entry="advertiser">
-              <span>📢</span>
-              <strong>Sou anunciante</strong>
-              <small>Quero cadastrar produtos, campanhas e vender no Shop.</small>
-            </button>
-          </div>
-
-          <div class="tabs">
-            <button class="tab active" data-auth="login">Entrar</button>
-            <button class="tab" data-auth="register">Criar conta</button>
-          </div>
-
-          <form id="loginForm" class="auth-form">
-            <label>E-mail<input type="email" id="loginEmail" required placeholder="seuemail@email.com"></label>
-            <label>Senha<input type="password" id="loginPassword" required placeholder="Digite sua senha"></label>
-            <button type="submit" class="primary">Entrar</button>
-          </form>
-
-          <form id="registerForm" class="auth-form hidden">
-            <label>Nome<input type="text" id="regName" required placeholder="Seu nome"></label>
-            <label>E-mail<input type="email" id="regEmail" required placeholder="seuemail@email.com"></label>
-            <label>Senha<input type="password" id="regPassword" required minlength="4" placeholder="Mínimo 4 caracteres"></label>
-            <div class="role-box">
-              <p>Perfil da conta</p>
-              <label class="checkline"><input type="checkbox" id="regAsUser" checked> Usuário comum: assistir vídeos, comprar e ganhar pontos</label>
-              <label class="checkline"><input type="checkbox" id="regAsAdvertiser"> Anunciante: cadastrar produtos e campanhas</label>
-              <small>Se escolher anunciante, o sistema libera também o Shop e o painel de campanhas. Admin continua separado para segurança.</small>
+      <section id="authScreen" class="screen active auth-landing">
+        <div class="landing-shell">
+          <div class="landing-intro">
+            <div class="app-pill">▶ AssistaPay</div>
+            <h2>Ganhe pontos assistindo vídeos. Venda produtos dentro do Shop.</h2>
+            <p>Uma plataforma de vídeos recompensados com marketplace interno, campanhas de anunciantes e controle de saldo para o sistema não quebrar.</p>
+            <div class="landing-steps">
+              <div><span>1</span><b>Assista</b><small>Veja vídeos no formato 9:16.</small></div>
+              <div><span>2</span><b>Interaja</b><small>Curta, compartilhe e responda.</small></div>
+              <div><span>3</span><b>Ganhe</b><small>Acumule pontos e solicite Pix.</small></div>
             </div>
-            <button type="submit" class="primary">Criar conta</button>
-          </form>
+          </div>
+
+          <div class="login-card card">
+            <div class="login-header">
+              <small>Escolha como deseja entrar</small>
+              <h3>Qual é o seu perfil?</h3>
+            </div>
+
+            <div class="entry-choice" id="entryChoice">
+              <button type="button" class="entry-card active" data-entry="user">
+                <span>👤</span>
+                <strong>Usuário comum</strong>
+                <small>Assistir vídeos, comprar no Shop e ganhar pontos.</small>
+              </button>
+              <button type="button" class="entry-card" data-entry="advertiser">
+                <span>📢</span>
+                <strong>Anunciante</strong>
+                <small>Cadastrar produtos, campanhas e vender no app.</small>
+              </button>
+            </div>
+
+            <div class="tabs">
+              <button class="tab active" data-auth="login">Entrar</button>
+              <button class="tab" data-auth="register">Criar conta</button>
+            </div>
+
+            <form id="loginForm" class="auth-form">
+              <label>E-mail<input type="email" id="loginEmail" required placeholder="seuemail@email.com"></label>
+              <label>Senha<input type="password" id="loginPassword" required placeholder="Digite sua senha"></label>
+              <button type="submit" class="primary">Entrar no AssistaPay</button>
+              <p class="demo-access">Teste rápido: user@teste.com, anunciante@teste.com ou admin@teste.com · senha 1234</p>
+            </form>
+
+            <form id="registerForm" class="auth-form hidden">
+              <label>Nome<input type="text" id="regName" required placeholder="Seu nome"></label>
+              <label>E-mail<input type="email" id="regEmail" required placeholder="seuemail@email.com"></label>
+              <label>Senha<input type="password" id="regPassword" required minlength="4" placeholder="Mínimo 4 caracteres"></label>
+              <div class="role-box">
+                <p>Perfil da conta</p>
+                <label class="checkline"><input type="checkbox" id="regAsUser" checked> Usuário comum: assistir vídeos, comprar e ganhar pontos</label>
+                <label class="checkline"><input type="checkbox" id="regAsAdvertiser"> Anunciante: cadastrar produtos e campanhas</label>
+                <small>Uma conta pode ser usuário e anunciante. O painel admin continua separado.</small>
+              </div>
+              <button type="submit" class="primary">Criar minha conta</button>
+            </form>
+          </div>
         </div>
       </section>
 
