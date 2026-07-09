@@ -24,6 +24,19 @@
         <div class="hero card">
           <h2>Assista vídeos, descubra produtos e acumule pontos</h2>
           <p>Uma plataforma de anúncios recompensados com controle financeiro para não pagar mais do que as campanhas recebem.</p>
+          <div class="entry-choice" id="entryChoice">
+            <button type="button" class="entry-card active" data-entry="user">
+              <span>👤</span>
+              <strong>Sou usuário comum</strong>
+              <small>Quero assistir vídeos, ver produtos e ganhar pontos.</small>
+            </button>
+            <button type="button" class="entry-card" data-entry="advertiser">
+              <span>📢</span>
+              <strong>Sou anunciante</strong>
+              <small>Quero cadastrar produtos, campanhas e vender no Shop.</small>
+            </button>
+          </div>
+
           <div class="tabs">
             <button class="tab active" data-auth="login">Entrar</button>
             <button class="tab" data-auth="register">Criar conta</button>
@@ -40,10 +53,10 @@
             <label>E-mail<input type="email" id="regEmail" required placeholder="seuemail@email.com"></label>
             <label>Senha<input type="password" id="regPassword" required minlength="4" placeholder="Mínimo 4 caracteres"></label>
             <div class="role-box">
-              <p>Tipo de conta</p>
-              <label class="checkline"><input type="checkbox" id="regAsUser" checked> Quero assistir vídeos e ganhar pontos</label>
-              <label class="checkline"><input type="checkbox" id="regAsAdvertiser"> Também quero anunciar meus produtos</label>
-              <small>Uma conta pode ser apenas usuário ou usuário + anunciante. Admin é separado para segurança.</small>
+              <p>Perfil da conta</p>
+              <label class="checkline"><input type="checkbox" id="regAsUser" checked> Usuário comum: assistir vídeos, comprar e ganhar pontos</label>
+              <label class="checkline"><input type="checkbox" id="regAsAdvertiser"> Anunciante: cadastrar produtos e campanhas</label>
+              <small>Se escolher anunciante, o sistema libera também o Shop e o painel de campanhas. Admin continua separado para segurança.</small>
             </div>
             <button type="submit" class="primary">Criar conta</button>
           </form>

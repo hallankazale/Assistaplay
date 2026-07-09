@@ -3,6 +3,7 @@ const POINTS_TO_BRL = 1000;
 const MIN_WITHDRAW_BRL = 20;
 const LS_KEY = 'assistapay_db_v3_shop';
 let currentUserId = localStorage.getItem('assistapay_current_user') || null;
+let selectedEntryProfile = localStorage.getItem('assistapay_entry_profile') || 'user';
 
 const sampleVideo = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
 
@@ -38,9 +39,11 @@ function rolesOf(u){
 }
 function hasRole(role){ return rolesOf(user()).includes(role); }
 function firstAllowedScreen(){
+  if(selectedEntryProfile === 'advertiser' && hasRole('advertiser')) return 'advertiserScreen';
+  if(selectedEntryProfile === 'user' && hasRole('user')) return 'userScreen';
   if(hasRole('admin')) return 'adminScreen';
-  if(hasRole('user')) return 'userScreen';
   if(hasRole('advertiser')) return 'advertiserScreen';
+  if(hasRole('user')) return 'userScreen';
   return 'authScreen';
 }
 function updateNavPermissions(){
@@ -106,11 +109,30 @@ $$('.tab').forEach(btn=>btn.onclick=()=>{
   $('#registerForm').classList.toggle('hidden', mode!=='register');
 });
 
+function setEntryProfile(profile){
+  selectedEntryProfile = profile;
+  localStorage.setItem('assistapay_entry_profile', profile);
+  $$('.entry-card').forEach(card=>card.classList.toggle('active', card.dataset.entry===profile));
+  const asAdvertiser = profile === 'advertiser';
+  if($('#regAsUser')) $('#regAsUser').checked = true;
+  if($('#regAsAdvertiser')) $('#regAsAdvertiser').checked = asAdvertiser;
+  const title = $('#loginEmail');
+  if(title){
+    title.placeholder = asAdvertiser ? 'email do anunciante' : 'seuemail@email.com';
+  }
+}
+$$('.entry-card').forEach(card=>card.onclick=()=>setEntryProfile(card.dataset.entry));
+setEntryProfile(selectedEntryProfile);
+
 $('#loginForm').onsubmit = e => {
   e.preventDefault();
   const email = $('#loginEmail').value.trim().toLowerCase(); const pass = $('#loginPassword').value;
   const found = db.users.find(u=>u.email===email && u.password===pass);
   if(!found) return toast('E-mail ou senha inválidos. Teste: user@teste.com / 1234');
+  const foundRoles = Array.isArray(found.roles) ? found.roles : (found.role ? [found.role] : ['user']);
+  if(selectedEntryProfile === 'advertiser' && !foundRoles.includes('advertiser') && !foundRoles.includes('admin')){
+    return toast('Essa conta não tem perfil de anunciante. Entre como usuário comum ou crie uma conta de anunciante.');
+  }
   currentUserId = found.id; localStorage.setItem('assistapay_current_user', currentUserId); authUI();
 };
 $('#registerForm').onsubmit = e => {
@@ -118,8 +140,8 @@ $('#registerForm').onsubmit = e => {
   const email = $('#regEmail').value.trim().toLowerCase();
   if(db.users.some(u=>u.email===email)) return toast('Este e-mail já existe.');
   const roles = [];
-  if($('#regAsUser').checked) roles.push('user');
-  if($('#regAsAdvertiser').checked) roles.push('advertiser');
+  if($('#regAsUser').checked || selectedEntryProfile === 'advertiser') roles.push('user');
+  if($('#regAsAdvertiser').checked || selectedEntryProfile === 'advertiser') roles.push('advertiser');
   if(!roles.length) roles.push('user');
   const newUser = {id:uid(), name:$('#regName').value.trim(), email, password:$('#regPassword').value, roles, points:0, interests:{}};
   db.users.push(newUser); saveDB(db); currentUserId = newUser.id; localStorage.setItem('assistapay_current_user', currentUserId); authUI();
