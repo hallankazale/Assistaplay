@@ -32,27 +32,7 @@ jobs:
 
       - name: Verificar sintaxe dos módulos
         run: |
-          node --check src/core/config.js
-          node --check src/core/storage.js
-          node --check src/core/permissions.js
-          node --check src/core/auth.js
-          node --check src/core/migrations.js
-          node --check src/core/database.js
-          node --check src/core/events.js
-          node --check src/core/features.js
-          node --check src/core/router.js
-          node --check src/core/engine.js
-          node --check src/core/logger.js
-          node --check src/bootstrap.js
-          node --check src/adapters/legacy-auth-adapter.js
-          node --check src/adapters/legacy-navigation-adapter.js
-          node --check src/modules/session/session.module.js
-          node --check src/modules/auth/auth.module.js
-          node --check src/modules/profile/profile.module.js
-          node --check src/modules/recommendation/recommendation.module.js
-          node --check src/modules/rewards/rewards.module.js
-          node --check src/modules/antifraud/antifraud.module.js
-          node --check src/modules/wallet/wallet.module.js
+          find src -name '*.js' -print0 | xargs -0 -n1 node --check
 
       - name: Executar testes centrais
         run: node tests/core-smoke.test.js
@@ -71,3 +51,6 @@ jobs:
 
       - name: Testar carteira e antifraude
         run: node tests/wallet-antifraud.test.js
+
+      - name: Testar produtos pedidos e afiliados
+        run: node tests/commerce-modules.test.js
