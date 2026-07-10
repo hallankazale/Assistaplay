@@ -1,0 +1,32 @@
+:root{
+  --ap-bg:#09090c;
+  --ap-surface:#121216;
+  --ap-surface-2:#1a1a20;
+  --ap-text:#ffffff;
+  --ap-muted:#a5a5b2;
+  --ap-primary:#7b3ff2;
+  --ap-primary-2:#9b5cff;
+  --ap-accent:#ff3f68;
+  --ap-success:#16c76b;
+  --ap-warning:#ffb020;
+  --ap-border:rgba(255,255,255,.1);
+  --ap-radius:18px;
+  --ap-nav-h:68px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--ap-bg);color:var(--ap-text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.ap-screen{min-height:100dvh;background:var(--ap-bg)}
+.ap-hidden{display:none!important}
+.ap-pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ap-border);border-radius:999px;padding:8px 12px;background:rgba(0,0,0,.35);backdrop-filter:blur(12px)}
+.ap-primary{border:0;border-radius:14px;background:linear-gradient(135deg,var(--ap-primary),var(--ap-primary-2));color:#fff;font-weight:700;padding:13px 18px}
+.ap-icon-btn{border:0;background:transparent;color:#fff;display:grid;place-items:center}
+.ap-bottom-nav{position:fixed;left:0;right:0;bottom:0;height:var(--ap-nav-h);z-index:40;background:rgba(7,7,10,.94);backdrop-filter:blur(18px);border-top:1px solid var(--ap-border);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 8px env(safe-area-inset-bottom)}
+.ap-bottom-nav button{border:0;background:transparent;color:var(--ap-muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px}
+.ap-bottom-nav button span{font-size:21px}
+.ap-bottom-nav button.active{color:#fff}
+.ap-bottom-nav button.active span{filter:drop-shadow(0 0 8px rgba(123,63,242,.8))}
+.ap-card{background:var(--ap-surface);border:1px solid var(--ap-border);border-radius:var(--ap-radius)}
+.ap-badge{display:inline-flex;align-items:center;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700;background:rgba(123,63,242,.18);color:#c9aaff}
+@media(min-width:700px){body{display:grid;place-items:center}.ap-app-shell{width:min(430px,100%);min-height:100dvh;position:relative;overflow:hidden;border-inline:1px solid var(--ap-border)}}
