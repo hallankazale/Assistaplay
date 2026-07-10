@@ -3,12 +3,6 @@
   const AP=global.AssistaPay=global.AssistaPay||{};
 
   function render(container){
-    const session=AP.engine?.get?.('session');
-    if(session?.isAuthenticated?.()){
-      global.location.href='feed.html';
-      return;
-    }
-
     container.innerHTML=`<div class="ap-onboarding-card">
       <section class="ap-screen-step ap-intro active" data-step="1">
         <div class="ap-logo">Assista<span>Pay</span></div>
@@ -40,7 +34,7 @@
           <button class="ap-gradient-btn" type="submit">Criar conta</button>
         </form>
         <div class="ap-divider">ou continue com</div>
-        <div class="ap-socials"><button class="ap-social" data-social="Google" aria-label="Entrar com Google">G</button><button class="ap-social" data-social="Apple" aria-label="Entrar com Apple">●</button><button class="ap-social" data-social="Facebook" aria-label="Entrar com Facebook">f</button></div>
+        <div class="ap-socials"><button class="ap-social" data-social="Google">G</button><button class="ap-social" data-social="Apple">●</button><button class="ap-social" data-social="Facebook">f</button></div>
         <div class="ap-login-link">Já tem conta? <button data-login>Entrar</button></div>
       </section>
 
@@ -56,95 +50,34 @@
           <button class="ap-gradient-btn" type="submit">Entrar</button>
         </form>
         <div class="ap-divider">ou continue com</div>
-        <div class="ap-socials"><button class="ap-social" data-social="Google" aria-label="Entrar com Google">G</button><button class="ap-social" data-social="Apple" aria-label="Entrar com Apple">●</button><button class="ap-social" data-social="Facebook" aria-label="Entrar com Facebook">f</button></div>
+        <div class="ap-socials"><button class="ap-social" data-social="Google">G</button><button class="ap-social" data-social="Apple">●</button><button class="ap-social" data-social="Facebook">f</button></div>
         <div class="ap-login-link">Ainda não tem conta? <button data-register>Cadastre-se</button></div>
       </section>
-
       <div class="ap-toast" id="apOnboardingToast" aria-live="polite"></div>
     </div>`;
     bind(container);
   }
 
-  function show(container,step){
-    container.querySelectorAll('.ap-screen-step').forEach(el=>el.classList.toggle('active',el.dataset.step===String(step)));
-    container.querySelectorAll('.ap-form-status').forEach(el=>{el.textContent='';el.className='ap-form-status';});
-  }
-
-  function status(element,message,type='error'){
-    element.textContent=message;
-    element.className=`ap-form-status ${type}`;
-  }
-
-  function toast(container,message){
-    const element=container.querySelector('#apOnboardingToast');
-    element.textContent=message;
-    element.classList.add('show');
-    clearTimeout(element._timer);
-    element._timer=setTimeout(()=>element.classList.remove('show'),2400);
-  }
-
-  function goToFeed(){
-    sessionStorage.setItem('ap:onboarded','1');
-    global.location.href='feed.html';
-  }
+  function show(container,step){container.querySelectorAll('.ap-screen-step').forEach(el=>el.classList.toggle('active',el.dataset.step===String(step)));container.querySelectorAll('.ap-form-status').forEach(el=>{el.textContent='';el.className='ap-form-status';});}
+  function status(element,message,type='error'){element.textContent=message;element.className=`ap-form-status ${type}`;}
+  function toast(container,message){const element=container.querySelector('#apOnboardingToast');element.textContent=message;element.classList.add('show');clearTimeout(element._timer);element._timer=setTimeout(()=>element.classList.remove('show'),2400);}
+  function goToFeed(){sessionStorage.setItem('ap:onboarded','1');global.location.href='feed.html';}
 
   function bind(container){
     let selectedRole='user';
     const auth=AP.engine?.get?.('auth-module');
-
     container.addEventListener('click',e=>{
-      const next=e.target.closest('[data-next]'); if(next) show(container,next.dataset.next);
-      const back=e.target.closest('[data-back]'); if(back) show(container,back.dataset.back);
-      if(e.target.closest('[data-login],[data-skip-login]')) show(container,4);
-      if(e.target.closest('[data-register]')) show(container,2);
-
-      const role=e.target.closest('[data-role]');
-      if(role){
-        selectedRole=role.dataset.role;
-        container.querySelectorAll('[data-role]').forEach(el=>el.classList.remove('selected'));
-        role.classList.add('selected');
-        setTimeout(()=>show(container,3),180);
-      }
-
-      const eye=e.target.closest('[data-eye]');
-      if(eye){
-        const input=eye.previousElementSibling;
-        input.type=input.type==='password'?'text':'password';
-        eye.textContent=input.type==='password'?'◉':'⊘';
-      }
-
-      const social=e.target.closest('[data-social]');
-      if(social) toast(container,`${social.dataset.social}: conexão será ativada quando configurarmos o provedor de login.`);
-
-      if(e.target.closest('[data-forgot]')){
-        const email=container.querySelector('#apLoginForm input[name="email"]').value.trim();
-        toast(container,email?`Orientações de recuperação serão enviadas para ${email}.`:'Digite seu e-mail para recuperar a senha.');
-      }
+      const next=e.target.closest('[data-next]');if(next)show(container,next.dataset.next);
+      const back=e.target.closest('[data-back]');if(back)show(container,back.dataset.back);
+      if(e.target.closest('[data-login],[data-skip-login]'))show(container,4);
+      if(e.target.closest('[data-register]'))show(container,2);
+      const role=e.target.closest('[data-role]');if(role){selectedRole=role.dataset.role;container.querySelectorAll('[data-role]').forEach(el=>el.classList.remove('selected'));role.classList.add('selected');setTimeout(()=>show(container,3),180);}
+      const eye=e.target.closest('[data-eye]');if(eye){const input=eye.previousElementSibling;input.type=input.type==='password'?'text':'password';eye.textContent=input.type==='password'?'◉':'⊘';}
+      const social=e.target.closest('[data-social]');if(social)toast(container,`${social.dataset.social}: login social será ativado com as chaves oficiais.`);
+      if(e.target.closest('[data-forgot]')){const email=container.querySelector('#apLoginForm input[name="email"]').value.trim();toast(container,email?`Recuperação preparada para ${email}.`:'Digite seu e-mail para recuperar a senha.');}
     });
-
-    container.querySelector('#apSignupForm').addEventListener('submit',e=>{
-      e.preventDefault();
-      const form=new FormData(e.currentTarget);
-      const result=auth?.signUp({
-        name:form.get('name'),
-        email:form.get('email'),
-        password:form.get('password'),
-        roles:selectedRole==='advertiser'?['user','advertiser']:['user']
-      });
-      const message=container.querySelector('[data-signup-status]');
-      if(result?.ok){status(message,'Conta criada com sucesso!','success');setTimeout(goToFeed,450);return;}
-      if(result?.error==='email-exists'){status(message,'Este e-mail já está cadastrado. Entre com sua conta.');return;}
-      status(message,'Confira nome, e-mail e senha. A senha precisa ter pelo menos 4 caracteres.');
-    });
-
-    container.querySelector('#apLoginForm').addEventListener('submit',e=>{
-      e.preventDefault();
-      const form=new FormData(e.currentTarget);
-      const result=auth?.signIn(form.get('email'),form.get('password'));
-      const message=container.querySelector('[data-login-status]');
-      if(result?.ok){status(message,'Login realizado com sucesso!','success');setTimeout(goToFeed,350);return;}
-      status(message,'E-mail ou senha incorretos.');
-    });
+    container.querySelector('#apSignupForm').addEventListener('submit',e=>{e.preventDefault();const form=new FormData(e.currentTarget);const result=auth?.signUp({name:form.get('name'),email:form.get('email'),password:form.get('password'),roles:selectedRole==='advertiser'?['user','advertiser']:['user']});const message=container.querySelector('[data-signup-status]');if(result?.ok){status(message,'Conta criada com sucesso!','success');setTimeout(goToFeed,450);return;}if(result?.error==='email-exists'){status(message,'Este e-mail já está cadastrado. Entre com sua conta.');return;}status(message,'Confira nome, e-mail e senha.');});
+    container.querySelector('#apLoginForm').addEventListener('submit',e=>{e.preventDefault();const form=new FormData(e.currentTarget);const result=auth?.signIn(form.get('email'),form.get('password'));const message=container.querySelector('[data-login-status]');if(result?.ok){status(message,'Login realizado com sucesso!','success');setTimeout(goToFeed,350);return;}status(message,'E-mail ou senha incorretos.');});
   }
 
   AP.onboardingUI=Object.freeze({render});
