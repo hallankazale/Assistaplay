@@ -44,7 +44,7 @@ jobs:
         run: node tests/auth-module.test.js
 
       - name: Testar fluxo inicial
-        run: node tests/onboarding-flow.test.js
+        run: node tests/onboarding-ui.test.js
 
       - name: Testar perfil
         run: node tests/profile-module.test.js
