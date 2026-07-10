@@ -51,6 +51,8 @@ jobs:
           node --check src/modules/profile/profile.module.js
           node --check src/modules/recommendation/recommendation.module.js
           node --check src/modules/rewards/rewards.module.js
+          node --check src/modules/antifraud/antifraud.module.js
+          node --check src/modules/wallet/wallet.module.js
 
       - name: Executar testes centrais
         run: node tests/core-smoke.test.js
@@ -66,3 +68,6 @@ jobs:
 
       - name: Testar recomendação e recompensas
         run: node tests/engines.test.js
+
+      - name: Testar carteira e antifraude
+        run: node tests/wallet-antifraud.test.js
