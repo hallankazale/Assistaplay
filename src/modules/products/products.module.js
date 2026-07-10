@@ -98,7 +98,29 @@
 
   function setStatus(actorId, productId, status) {
     if (!['active', 'paused', 'archived'].includes(status)) return { ok: false, error: 'invalid-status' };
-    return update(actorId, productId, { status });
+
+    const actor = AP.database.findUserById(actorId);
+    const product = AP.database.read().products.find((item) => item.id === productId);
+    if (!actor || !product) return { ok: false, error: 'not-found' };
+    if (product.advertiserId !== actorId && !AP.permissions.hasRole(actor, 'admin')) {
+      return { ok: false, error: 'permission-denied' };
+    }
+
+    AP.database.transaction((database) => {
+      const target = database.products.find((item) => item.id === productId);
+      target.status = status;
+      target.updatedAt = new Date().toISOString();
+      database.auditLogs.push({
+        id: `audit_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+        action: 'product:status-changed',
+        actorId,
+        details: { productId, status },
+        createdAt: new Date().toISOString()
+      });
+    });
+
+    AP.events.emit('product:status-changed', { productId, actorId, status });
+    return { ok: true, product: AP.database.read().products.find((item) => item.id === productId) };
   }
 
   AP.engine.register('products', {
