@@ -47,7 +47,7 @@
           <div class="ap-input-wrap"><input name="password" autocomplete="current-password" type="password" placeholder="Senha" required><button type="button" class="ap-eye" data-eye>◉</button></div>
           <button type="button" class="ap-forgot" data-forgot>Esqueci minha senha</button>
           <div class="ap-form-status" data-login-status aria-live="polite"></div>
-          <button class="ap-gradient-btn" type="submit">Entrar</button>
+          <button class="ap-gradient-btn" type="button" data-submit-login>Entrar</button>
         </form>
         <div class="ap-divider">ou continue com</div>
         <div class="ap-socials"><button class="ap-social" data-social="Google">G</button><button class="ap-social" data-social="Apple">●</button><button class="ap-social" data-social="Facebook">f</button></div>
@@ -66,6 +66,11 @@
   function bind(container){
     let selectedRole='user';
     const auth=AP.engine?.get?.('auth-module');
+    const loginForm=container.querySelector('#apLoginForm');
+
+    loginForm.addEventListener('submit',event=>event.preventDefault());
+    loginForm.addEventListener('keydown',event=>{if(event.key==='Enter')event.preventDefault();});
+
     container.addEventListener('click',e=>{
       const next=e.target.closest('[data-next]');if(next)show(container,next.dataset.next);
       const back=e.target.closest('[data-back]');if(back)show(container,back.dataset.back);
@@ -74,10 +79,18 @@
       const role=e.target.closest('[data-role]');if(role){selectedRole=role.dataset.role;container.querySelectorAll('[data-role]').forEach(el=>el.classList.remove('selected'));role.classList.add('selected');setTimeout(()=>show(container,3),180);}
       const eye=e.target.closest('[data-eye]');if(eye){const input=eye.previousElementSibling;input.type=input.type==='password'?'text':'password';eye.textContent=input.type==='password'?'◉':'⊘';}
       const social=e.target.closest('[data-social]');if(social)toast(container,`${social.dataset.social}: login social será ativado com as chaves oficiais.`);
-      if(e.target.closest('[data-forgot]')){const email=container.querySelector('#apLoginForm input[name="email"]').value.trim();toast(container,email?`Recuperação preparada para ${email}.`:'Digite seu e-mail para recuperar a senha.');}
+      if(e.target.closest('[data-forgot]')){const email=loginForm.querySelector('input[name="email"]').value.trim();toast(container,email?`Recuperação preparada para ${email}.`:'Digite seu e-mail para recuperar a senha.');}
+      if(e.target.closest('[data-submit-login]')){
+        if(!loginForm.reportValidity())return;
+        const form=new FormData(loginForm);
+        const result=auth?.signIn(form.get('email'),form.get('password'));
+        const message=container.querySelector('[data-login-status]');
+        if(result?.ok){status(message,'Login realizado com sucesso!','success');setTimeout(goToFeed,350);return;}
+        status(message,'E-mail ou senha incorretos.');
+      }
     });
+
     container.querySelector('#apSignupForm').addEventListener('submit',e=>{e.preventDefault();const form=new FormData(e.currentTarget);const result=auth?.signUp({name:form.get('name'),email:form.get('email'),password:form.get('password'),roles:selectedRole==='advertiser'?['user','advertiser']:['user']});const message=container.querySelector('[data-signup-status]');if(result?.ok){status(message,'Conta criada com sucesso!','success');setTimeout(goToFeed,450);return;}if(result?.error==='email-exists'){status(message,'Este e-mail já está cadastrado. Entre com sua conta.');return;}status(message,'Confira nome, e-mail e senha.');});
-    container.querySelector('#apLoginForm').addEventListener('submit',e=>{e.preventDefault();const form=new FormData(e.currentTarget);const result=auth?.signIn(form.get('email'),form.get('password'));const message=container.querySelector('[data-login-status]');if(result?.ok){status(message,'Login realizado com sucesso!','success');setTimeout(goToFeed,350);return;}status(message,'E-mail ou senha incorretos.');});
   }
 
   AP.onboardingUI=Object.freeze({render});
