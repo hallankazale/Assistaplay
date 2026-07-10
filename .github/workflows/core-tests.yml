@@ -54,3 +54,6 @@ jobs:
 
       - name: Testar produtos pedidos e afiliados
         run: node tests/commerce-modules.test.js
+
+      - name: Validar preview do feed
+        run: node tests/feed-preview.test.js
