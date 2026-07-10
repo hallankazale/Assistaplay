@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#09090d">
+  <title>AssistaPay</title>
+  <link rel="stylesheet" href="../src/styles/design-system.css">
+  <link rel="stylesheet" href="../src/styles/onboarding.css">
+  <link rel="stylesheet" href="../src/styles/app-pages.css">
+</head>
+<body>
+  <div id="appPage"></div>
+  <script src="../src/core/config.js"></script>
+  <script src="../src/core/storage.js"></script>
+  <script src="../src/core/permissions.js"></script>
+  <script src="../src/core/auth.js"></script>
+  <script src="../src/core/migrations.js"></script>
+  <script src="../src/core/database.js"></script>
+  <script src="../src/core/events.js"></script>
+  <script src="../src/core/features.js"></script>
+  <script src="../src/core/router.js"></script>
+  <script src="../src/core/engine.js"></script>
+  <script src="../src/core/logger.js"></script>
+  <script src="../src/modules/session/session.module.js"></script>
+  <script src="../src/modules/auth/auth.module.js"></script>
+  <script src="../src/modules/navigation/pages.ui.js"></script>
+  <script>
+    window.AssistaPay.engine.start();
+    window.AssistaPay.pagesUI.render(document.getElementById('appPage'));
+  </script>
+</body>
+</html>
