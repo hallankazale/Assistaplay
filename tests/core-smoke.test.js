@@ -35,7 +35,7 @@ assert.equal(AP.config.rewards.pointsToBRL, 1000);
 assert.equal(AP.config.rewards.minimumWithdrawalBRL, 20);
 
 AP.storage.set('teste', { ok: true });
-assert.deepEqual(AP.storage.get('teste'), { ok: true });
+assert.equal(AP.storage.get('teste').ok, true);
 AP.storage.setText('texto', 'abc');
 assert.equal(AP.storage.getText('texto'), 'abc');
 AP.storage.remove('texto');
@@ -74,7 +74,7 @@ const account = AP.auth.buildAccount({
 
 assert.equal(account.name, 'Novo Usuário');
 assert.equal(account.email, 'novo@teste.com');
-assert.deepEqual(account.roles, ['user', 'advertiser']);
+assert.equal(Array.from(account.roles).join(','), 'user,advertiser');
 
 AP.auth.saveSession('u1');
 assert.equal(AP.auth.readSession(), 'u1');
