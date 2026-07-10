@@ -49,3 +49,6 @@ jobs:
 
       - name: Executar testes centrais
         run: node tests/core-smoke.test.js
+
+      - name: Validar integração modular
+        run: node tests/integration-order.test.js
