@@ -48,6 +48,9 @@ jobs:
           node --check src/adapters/legacy-navigation-adapter.js
           node --check src/modules/session/session.module.js
           node --check src/modules/auth/auth.module.js
+          node --check src/modules/profile/profile.module.js
+          node --check src/modules/recommendation/recommendation.module.js
+          node --check src/modules/rewards/rewards.module.js
 
       - name: Executar testes centrais
         run: node tests/core-smoke.test.js
@@ -57,3 +60,9 @@ jobs:
 
       - name: Testar sessão e autenticação
         run: node tests/auth-module.test.js
+
+      - name: Testar perfil
+        run: node tests/profile-module.test.js
+
+      - name: Testar recomendação e recompensas
+        run: node tests/engines.test.js
