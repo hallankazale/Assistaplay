@@ -31,6 +31,7 @@ AP.database.write({
   users: [
     { id:'u1', name:'Usuário', roles:['user'], points:30000, interests:{} },
     { id:'u2', name:'Baixo saldo', roles:['user'], points:5000, interests:{} },
+    { id:'u3', name:'Conta de risco', roles:['user'], points:30000, interests:{} },
     { id:'admin1', name:'Admin', roles:['admin'], points:0, interests:{} }
   ]
 });
@@ -64,10 +65,11 @@ assert.equal(second.ok, true);
 assert.equal(wallet.updateWithdrawalStatus(second.withdrawal.id, 'approved', 'admin1').ok, true);
 assert.equal(wallet.updateWithdrawalStatus(second.withdrawal.id, 'paid', 'admin1').ok, true);
 assert.equal(wallet.getWallet('u1').availableBRL, 10);
+assert.equal(wallet.requestWithdrawal({ userId:'u1', pixKey:'abc', amountBRL:20 }).error, 'insufficient-balance');
 
-antifraud.reviewUser('u1', { impossibleTiming:true, duplicateIdentity:true });
-assert.equal(antifraud.canReceiveReward('u1').allowed, false);
-assert.equal(wallet.requestWithdrawal({ userId:'u1', pixKey:'abc', amountBRL:20 }).error, 'below-minimum');
+antifraud.reviewUser('u3', { impossibleTiming:true, duplicateIdentity:true });
+assert.equal(antifraud.canReceiveReward('u3').allowed, false);
+assert.equal(wallet.requestWithdrawal({ userId:'u3', pixKey:'abc', amountBRL:20 }).error, 'risk-blocked');
 
 assert.ok(AP.database.read().auditLogs.some((log)=>log.action==='wallet:withdrawal-requested'));
 assert.ok(AP.database.read().auditLogs.some((log)=>log.action==='antifraud:user-reviewed'));
