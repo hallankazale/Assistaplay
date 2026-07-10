@@ -25,7 +25,7 @@ jobs:
       - name: Preparar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Verificar sintaxe do app atual
         run: node --check app.js
@@ -36,6 +36,7 @@ jobs:
           node --check src/core/storage.js
           node --check src/core/permissions.js
           node --check src/core/auth.js
+          node --check src/core/migrations.js
 
-      - name: Executar testes de autenticação, permissões e armazenamento
+      - name: Executar testes de autenticação, permissões, armazenamento e migração
         run: node tests/core-smoke.test.js
