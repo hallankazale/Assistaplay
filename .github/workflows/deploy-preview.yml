@@ -26,6 +26,7 @@ jobs:
         run: |
           mkdir -p _site/src
           cp integration/feed-preview.html _site/index.html
+          sed -i 's#../src/#./src/#g' _site/index.html
           cp -R src/core _site/src/core
           cp -R src/modules _site/src/modules
           cp -R src/styles _site/src/styles
