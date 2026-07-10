@@ -30,7 +30,7 @@ jobs:
       - name: Verificar sintaxe do app atual
         run: node --check app.js
 
-      - name: Verificar sintaxe dos módulos centrais
+      - name: Verificar sintaxe dos módulos
         run: |
           node --check src/core/config.js
           node --check src/core/storage.js
@@ -46,9 +46,14 @@ jobs:
           node --check src/bootstrap.js
           node --check src/adapters/legacy-auth-adapter.js
           node --check src/adapters/legacy-navigation-adapter.js
+          node --check src/modules/session/session.module.js
+          node --check src/modules/auth/auth.module.js
 
       - name: Executar testes centrais
         run: node tests/core-smoke.test.js
 
       - name: Validar integração modular
         run: node tests/integration-order.test.js
+
+      - name: Testar sessão e autenticação
+        run: node tests/auth-module.test.js
