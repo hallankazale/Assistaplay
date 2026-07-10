@@ -42,6 +42,10 @@ jobs:
           node --check src/core/features.js
           node --check src/core/router.js
           node --check src/core/engine.js
+          node --check src/core/logger.js
+          node --check src/bootstrap.js
+          node --check src/adapters/legacy-auth-adapter.js
+          node --check src/adapters/legacy-navigation-adapter.js
 
       - name: Executar testes centrais
         run: node tests/core-smoke.test.js
