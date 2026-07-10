@@ -38,6 +38,10 @@ jobs:
           node --check src/core/auth.js
           node --check src/core/migrations.js
           node --check src/core/database.js
+          node --check src/core/events.js
+          node --check src/core/features.js
+          node --check src/core/router.js
+          node --check src/core/engine.js
 
       - name: Executar testes centrais
         run: node tests/core-smoke.test.js
