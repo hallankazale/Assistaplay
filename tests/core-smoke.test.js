@@ -27,6 +27,7 @@ load('src/core/config.js');
 load('src/core/storage.js');
 load('src/core/permissions.js');
 load('src/core/auth.js');
+load('src/core/migrations.js');
 
 const AP = window.AssistaPay;
 assert.ok(AP, 'Namespace AssistaPay deve existir');
@@ -80,5 +81,21 @@ AP.auth.saveSession('u1');
 assert.equal(AP.auth.readSession(), 'u1');
 AP.auth.clearSession();
 assert.equal(AP.auth.readSession(), null);
+
+const oldDatabase = {
+  users: [{ id: 'antigo', role: 'advertiser', points: '15' }],
+  campaigns: [{ id: 'c1', title: 'Campanha antiga' }],
+  products: [{ id: 'p1', name: 'Produto preservado' }]
+};
+
+const migrated = AP.migrations.migrate(oldDatabase);
+assert.equal(migrated.schemaVersion, 3);
+assert.equal(migrated.users[0].points, 15);
+assert.equal(Array.from(migrated.users[0].roles).join(','), 'advertiser');
+assert.equal(migrated.products[0].name, 'Produto preservado');
+assert.equal(migrated.campaigns[0].title, 'Campanha antiga');
+assert.equal(migrated.campaigns[0].ctaText, 'Ver produto');
+assert.equal(migrated.orders.length, 0);
+assert.equal(migrated.auditLogs.length, 0);
 
 console.log('Core smoke tests: OK');
