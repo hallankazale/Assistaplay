@@ -4,7 +4,6 @@
   const DB_NAME='assistapay-publications';
   const DB_VERSION=1;
   const STORE='publications';
-
   function openDB(){return new Promise((resolve,reject)=>{const request=indexedDB.open(DB_NAME,DB_VERSION);request.onupgradeneeded=()=>{const db=request.result;if(!db.objectStoreNames.contains(STORE)){const store=db.createObjectStore(STORE,{keyPath:'id'});store.createIndex('status','status');store.createIndex('authorId','authorId');store.createIndex('createdAt','createdAt');}};request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);request.onblocked=()=>reject(new Error('Banco de publicações bloqueado'));});}
   async function withStore(mode,callback){const db=await openDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,mode);const store=tx.objectStore(STORE);let result;try{result=callback(store);}catch(error){db.close();reject(error);return;}tx.oncomplete=()=>{db.close();resolve(result);};tx.onerror=()=>{db.close();reject(tx.error);};tx.onabort=()=>{db.close();reject(tx.error||new Error('Operação cancelada'));};});}
   function requestResult(request){return new Promise((resolve,reject)=>{request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});}
@@ -18,12 +17,8 @@
   async function update(id,patch){const item=await get(id);if(!item)return null;return save({...item,...patch,id,mediaBlob:patch.mediaBlob===undefined?item.mediaBlob:patch.mediaBlob});}
   function toViewModel(item){return {...item,media:item.mediaBlob?URL.createObjectURL(item.mediaBlob):'',cover:item.coverBlob?URL.createObjectURL(item.coverBlob):'',likes:String(item.likes||0),comments:String(item.comments||0),shares:String(item.shares||0),saves:String(item.saves||0),category:item.objective||'Conteúdo'};}
   AP.publicationStore=Object.freeze({save,get,list,listPublished,listByAuthor,remove,update,toViewModel,currentAuthor});
-
-  if(!global.__apCreateFixLoader&&/app\.html$/i.test(global.location.pathname)){
-    global.__apCreateFixLoader=true;
-    const script=document.createElement('script');
-    script.src='../src/modules/create/create-fixes.js';
-    script.defer=true;
-    document.head.appendChild(script);
+  if(/app\.html$/i.test(global.location.pathname)){
+    if(!global.__apCreateFixLoader){global.__apCreateFixLoader=true;const s=document.createElement('script');s.src='../src/modules/create/create-fixes.js';s.defer=true;document.head.appendChild(s);}
+    if(!global.__apProfileStoryLoader){global.__apProfileStoryLoader=true;const css=document.createElement('link');css.rel='stylesheet';css.href='../src/styles/profile-story-fix.css';document.head.appendChild(css);const s=document.createElement('script');s.src='../src/modules/profile/profile-story-fix.js';s.defer=true;document.head.appendChild(s);}
   }
 })(window);
