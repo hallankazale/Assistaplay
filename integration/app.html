@@ -28,6 +28,7 @@
   <script src="../src/core/logger.js"></script>
   <script src="../src/modules/session/session.module.js"></script>
   <script src="../src/modules/auth/auth.module.js"></script>
+  <script src="../src/modules/publications/publication.store.js"></script>
   <script src="../src/modules/wallet/wallet.ui.js"></script>
   <script src="../src/modules/profile/profile.ui.js"></script>
   <script src="../src/modules/create/create.ui.js"></script>
@@ -35,23 +36,17 @@
   <script src="../src/modules/navigation/pages.ui.js"></script>
   <script>
     window.AssistaPay.engine.start();
-    const session = window.AssistaPay.engine.get('session');
-    if (!session?.isAuthenticated?.()) {
+    const session=window.AssistaPay.engine.get('session');
+    if(!session?.isAuthenticated?.()){
       window.location.replace('index.html');
-    } else {
-      const container = document.getElementById('appPage');
-      const view = new URLSearchParams(window.location.search).get('view');
-      if (view === 'wallet') {
-        window.AssistaPay.walletUI.render(container);
-      } else if (view === 'profile') {
-        window.AssistaPay.profileUI.render(container);
-      } else if (view === 'create') {
-        window.AssistaPay.createUI.render(container);
-      } else if (view === 'seller-center') {
-        window.AssistaPay.sellerCenterUI.render(container);
-      } else {
-        window.AssistaPay.pagesUI.render(container);
-      }
+    }else{
+      const container=document.getElementById('appPage');
+      const view=new URLSearchParams(window.location.search).get('view');
+      if(view==='wallet')window.AssistaPay.walletUI.render(container);
+      else if(view==='profile')window.AssistaPay.profileUI.render(container);
+      else if(view==='create')window.AssistaPay.createUI.render(container);
+      else if(view==='seller-center')window.AssistaPay.sellerCenterUI.render(container);
+      else window.AssistaPay.pagesUI.render(container);
     }
   </script>
 </body>
