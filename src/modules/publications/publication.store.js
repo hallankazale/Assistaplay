@@ -18,4 +18,12 @@
   async function update(id,patch){const item=await get(id);if(!item)return null;return save({...item,...patch,id,mediaBlob:patch.mediaBlob===undefined?item.mediaBlob:patch.mediaBlob});}
   function toViewModel(item){return {...item,media:item.mediaBlob?URL.createObjectURL(item.mediaBlob):'',cover:item.coverBlob?URL.createObjectURL(item.coverBlob):'',likes:String(item.likes||0),comments:String(item.comments||0),shares:String(item.shares||0),saves:String(item.saves||0),category:item.objective||'Conteúdo'};}
   AP.publicationStore=Object.freeze({save,get,list,listPublished,listByAuthor,remove,update,toViewModel,currentAuthor});
+
+  if(!global.__apCreateFixLoader&&/app\.html$/i.test(global.location.pathname)){
+    global.__apCreateFixLoader=true;
+    const script=document.createElement('script');
+    script.src='../src/modules/create/create-fixes.js';
+    script.defer=true;
+    document.head.appendChild(script);
+  }
 })(window);
