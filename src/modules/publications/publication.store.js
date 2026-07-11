@@ -17,8 +17,13 @@
   async function update(id,patch){const item=await get(id);if(!item)return null;return save({...item,...patch,id,mediaBlob:patch.mediaBlob===undefined?item.mediaBlob:patch.mediaBlob});}
   function toViewModel(item){return {...item,media:item.mediaBlob?URL.createObjectURL(item.mediaBlob):'',cover:item.coverBlob?URL.createObjectURL(item.coverBlob):'',likes:String(item.likes||0),comments:String(item.comments||0),shares:String(item.shares||0),saves:String(item.saves||0),category:item.objective||'Conteúdo'};}
   AP.publicationStore=Object.freeze({save,get,list,listPublished,listByAuthor,remove,update,toViewModel,currentAuthor});
+
+  function loadScript(src,onload){const s=document.createElement('script');s.src=src;s.defer=true;if(onload)s.onload=onload;document.head.appendChild(s);}
   if(/app\.html$/i.test(global.location.pathname)){
-    if(!global.__apCreateFixLoader){global.__apCreateFixLoader=true;const s=document.createElement('script');s.src='../src/modules/create/create-fixes.js';s.defer=true;document.head.appendChild(s);}
-    if(!global.__apProfileStoryLoader){global.__apProfileStoryLoader=true;const css=document.createElement('link');css.rel='stylesheet';css.href='../src/styles/profile-story-fix.css';document.head.appendChild(css);const s=document.createElement('script');s.src='../src/modules/profile/profile-story-fix.js';s.defer=true;document.head.appendChild(s);}
+    if(!global.__apCreateFixLoader){global.__apCreateFixLoader=true;loadScript('../src/modules/create/create-fixes.js');}
+    if(!global.__apProfileStoryLoader){global.__apProfileStoryLoader=true;const css=document.createElement('link');css.rel='stylesheet';css.href='../src/styles/profile-story-fix.css';document.head.appendChild(css);loadScript('../src/modules/profile/profile-story-fix.js');}
+  }
+  if(/feed-preview\.html$/i.test(global.location.pathname)){
+    if(!global.__apSocialLoader){global.__apSocialLoader=true;const css=document.createElement('link');css.rel='stylesheet';css.href='../src/styles/social-feed.css';document.head.appendChild(css);loadScript('../src/modules/social/social.store.js',()=>loadScript('../src/modules/social/social-feed.js'));}
   }
 })(window);
