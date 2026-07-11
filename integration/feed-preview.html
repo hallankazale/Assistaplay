@@ -42,7 +42,12 @@
   <script src="../src/modules/feed/feed.ui.js"></script>
   <script>
     window.AssistaPay.engine.start();
-    window.AssistaPay.feedUI.render(document.getElementById('feed'));
+    const session = window.AssistaPay.engine.get('session');
+    if (!session?.isAuthenticated?.()) {
+      window.location.replace('index.html');
+    } else {
+      window.AssistaPay.feedUI.render(document.getElementById('feed'));
+    }
   </script>
 </body>
 </html>
