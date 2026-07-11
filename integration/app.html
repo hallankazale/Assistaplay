@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../src/styles/onboarding.css">
   <link rel="stylesheet" href="../src/styles/app-pages.css">
   <link rel="stylesheet" href="../src/styles/wallet.css">
+  <link rel="stylesheet" href="../src/styles/profile.css">
 </head>
 <body>
   <div id="appPage"></div>
@@ -26,6 +27,7 @@
   <script src="../src/modules/session/session.module.js"></script>
   <script src="../src/modules/auth/auth.module.js"></script>
   <script src="../src/modules/wallet/wallet.ui.js"></script>
+  <script src="../src/modules/profile/profile.ui.js"></script>
   <script src="../src/modules/navigation/pages.ui.js"></script>
   <script>
     window.AssistaPay.engine.start();
@@ -37,6 +39,8 @@
       const view = new URLSearchParams(window.location.search).get('view');
       if (view === 'wallet') {
         window.AssistaPay.walletUI.render(container);
+      } else if (view === 'profile') {
+        window.AssistaPay.profileUI.render(container);
       } else {
         window.AssistaPay.pagesUI.render(container);
       }
