@@ -11,6 +11,7 @@
         <div class="ap-menu-user"><div class="ap-menu-avatar">👤</div><div><strong id="apMenuUserName">Conta AssistaPay</strong><small id="apMenuUserRole">Usuário</small></div></div>
         <nav>
           <button data-menu-action="home">⌂ <span>Início</span></button>
+          <button data-menu-action="notifications">🔔 <span>Notificações</span><b id="apMenuNotificationBadge"></b></button>
           <button data-menu-action="restart">↶ <span>Ver apresentação novamente</span></button>
           <button data-menu-action="logout" class="danger">⇥ <span>Sair da conta</span></button>
         </nav>
@@ -23,6 +24,7 @@
       if(!button)return;
       const action=button.dataset.menuAction;
       if(action==='home'){close();document.querySelector('.ap-feed')?.scrollTo({top:0,behavior:'smooth'});}
+      if(action==='notifications'){global.location.href='app.html?view=notifications';}
       if(action==='restart'){sessionStorage.removeItem('ap:onboarded');global.location.href='index.html?preview=1';}
       if(action==='logout'){
         AP.engine?.get?.('auth-module')?.signOut?.();
@@ -37,6 +39,9 @@
     const account=AP.engine?.get?.('session')?.getCurrentAccount?.();
     document.getElementById('apMenuUserName').textContent=account?.name||'Conta AssistaPay';
     document.getElementById('apMenuUserRole').textContent=account?.roles?.includes('advertiser')?'Usuário e anunciante':'Usuário';
+    const badge=document.getElementById('apMenuNotificationBadge');
+    const unread=AP.notificationsStore?.unreadCount?.()||0;
+    if(badge){badge.textContent=unread?String(unread):'';badge.style.display=unread?'inline-grid':'none';}
     document.getElementById('apMenuBackdrop').classList.add('open');
     const menu=document.getElementById('apAppMenu');menu.classList.add('open');menu.setAttribute('aria-hidden','false');
   }
