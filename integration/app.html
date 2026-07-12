@@ -48,13 +48,17 @@
       window.location.replace('index.html');
     }else{
       const container=document.getElementById('appPage');
-      const view=new URLSearchParams(window.location.search).get('view');
+      const params=new URLSearchParams(window.location.search);
+      const view=params.get('view');
       if(view==='wallet')window.AssistaPay.walletUI.render(container);
       else if(view==='profile')window.AssistaPay.profileUI.render(container);
       else if(view==='create')window.AssistaPay.createUI.render(container);
       else if(view==='seller-center')window.AssistaPay.sellerCenterUI.render(container);
-      else if(view==='search')window.AssistaPay.searchUI.render(container);
-      else window.AssistaPay.pagesUI.render(container);
+      else if(view==='search'){
+        window.AssistaPay.searchUI.render(container);
+        const userId=params.get('user');
+        if(userId)window.AssistaPay.publicProfile?.open(userId);
+      }else window.AssistaPay.pagesUI.render(container);
     }
   </script>
 </body>
