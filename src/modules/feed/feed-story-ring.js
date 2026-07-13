@@ -5,7 +5,11 @@
   global.__apFeedStoryRing=true;
 
   const DAY=24*60*60*1000;
-  let activeStory=null;
+  const DEMO_STORIES={
+    'bea-beauty':{url:'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=900&q=85',mediaType:'image/jpeg',createdAt:new Date().toISOString()},
+    'casa-pratica':{url:'https://images.unsplash.com/photo-1484101403633-562f891dc89a?auto=format&fit=crop&w=900&q=85',mediaType:'image/jpeg',createdAt:new Date().toISOString()}
+  };
+  let storiesByAuthor=new Map();
   let activeUrl='';
 
   function readProfile(){
@@ -18,17 +22,28 @@
     catch{return '';}
   }
 
-  async function latestStory(){
-    if(!AP.publicationStore)return null;
-    const items=await AP.publicationStore.listPublished();
-    return items.find(item=>item.type==='story'&&item.mediaBlob&&(Date.now()-new Date(item.createdAt).getTime())<DAY)||null;
+  function isActive(createdAt){
+    const time=new Date(createdAt||0).getTime();
+    return Number.isFinite(time)&&time>0&&(Date.now()-time)<DAY;
   }
 
-  function profileStoryActive(){
+  async function buildStoryMap(){
+    const map=new Map();
+    if(AP.publicationStore){
+      const items=await AP.publicationStore.listPublished();
+      items.filter(item=>item.type==='story'&&item.mediaBlob&&isActive(item.createdAt)).forEach(item=>{
+        const previous=map.get(item.authorId);
+        if(!previous||new Date(item.createdAt)>new Date(previous.createdAt))map.set(item.authorId,{kind:'blob',item,createdAt:item.createdAt,mediaType:item.mediaType});
+      });
+    }
     const profile=readProfile();
-    if(!profile.story)return false;
-    const created=new Date(profile.storyCreatedAt||0).getTime();
-    return Number.isFinite(created)&&created>0&&(Date.now()-created)<DAY;
+    const ownId=currentAuthorId();
+    if(ownId&&profile.story&&isActive(profile.storyCreatedAt)){
+      const previous=map.get(ownId);
+      if(!previous||new Date(profile.storyCreatedAt)>new Date(previous.createdAt))map.set(ownId,{kind:'url',url:profile.story,createdAt:profile.storyCreatedAt,mediaType:'image/jpeg'});
+    }
+    Object.entries(DEMO_STORIES).forEach(([authorId,story])=>{if(isActive(story.createdAt)&&!map.has(authorId))map.set(authorId,{kind:'url',...story});});
+    storiesByAuthor=map;
   }
 
   function closeViewer(){
@@ -38,18 +53,18 @@
     viewer.remove();
   }
 
-  function openViewer(){
-    const profile=readProfile();
-    let source='';
-    let isVideo=false;
-    if(activeStory?.mediaBlob){
+  function openViewer(authorId){
+    const story=storiesByAuthor.get(authorId);
+    if(!story)return;
+    let source=story.url||'';
+    if(story.kind==='blob'&&story.item?.mediaBlob){
       if(activeUrl)URL.revokeObjectURL(activeUrl);
-      activeUrl=URL.createObjectURL(activeStory.mediaBlob);
+      activeUrl=URL.createObjectURL(story.item.mediaBlob);
       source=activeUrl;
-      isVideo=String(activeStory.mediaType).startsWith('video/');
-    }else if(profileStoryActive())source=profile.story;
+    }
     if(!source)return;
     closeViewer();
+    const isVideo=String(story.mediaType||story.item?.mediaType||'').startsWith('video/');
     const viewer=document.createElement('div');
     viewer.id='apFeedStoryViewer';
     viewer.className='ap-feed-story-viewer';
@@ -61,20 +76,23 @@
   }
 
   async function apply(){
-    const authorId=currentAuthorId();
-    if(!authorId)return;
-    activeStory=await latestStory();
-    const hasStory=!!activeStory||profileStoryActive();
-    document.querySelectorAll(`.ap-video-slide[data-author-id="${CSS.escape(authorId)}"] .ap-avatar-button`).forEach(button=>{
+    await buildStoryMap();
+    document.querySelectorAll('.ap-video-slide').forEach(slide=>{
+      const authorId=slide.dataset.authorId||'';
+      const button=slide.querySelector('.ap-avatar-button');
+      if(!button)return;
+      const hasStory=storiesByAuthor.has(authorId);
       button.classList.toggle('has-story',hasStory);
       button.setAttribute('aria-label',hasStory?'Ver story':'Abrir perfil');
-      if(hasStory&&!button.dataset.storyBound){
+      button.dataset.storyAuthorId=authorId;
+      if(!button.dataset.storyBound){
         button.dataset.storyBound='1';
         button.addEventListener('click',event=>{
-          if(!button.classList.contains('has-story'))return;
+          const id=button.dataset.storyAuthorId||'';
+          if(!button.classList.contains('has-story')||!storiesByAuthor.has(id))return;
           event.preventDefault();
           event.stopImmediatePropagation();
-          openViewer();
+          openViewer(id);
         },true);
       }
     });
@@ -86,5 +104,5 @@
   if(document.readyState!=='loading')apply().catch(()=>{});
   setInterval(()=>apply().catch(()=>{}),60000);
 
-  AP.feedStoryRing=Object.freeze({apply});
+  AP.feedStoryRing=Object.freeze({apply,openViewer});
 })(window);
