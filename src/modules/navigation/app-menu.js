@@ -11,6 +11,7 @@
         <div class="ap-menu-user"><div class="ap-menu-avatar">👤</div><div><strong id="apMenuUserName">Conta AssistaPay</strong><small id="apMenuUserRole">Usuário</small></div></div>
         <nav>
           <button data-menu-action="home">⌂ <span>Início</span></button>
+          <button data-menu-action="shop">🛒 <span>Shop</span></button>
           <button data-menu-action="notifications">🔔 <span>Notificações</span><b id="apMenuNotificationBadge"></b></button>
           <button data-menu-action="restart">↶ <span>Ver apresentação novamente</span></button>
           <button data-menu-action="logout" class="danger">⇥ <span>Sair da conta</span></button>
@@ -24,6 +25,7 @@
       if(!button)return;
       const action=button.dataset.menuAction;
       if(action==='home'){close();document.querySelector('.ap-feed')?.scrollTo({top:0,behavior:'smooth'});}
+      if(action==='shop'){global.location.href='app.html?view=shop';}
       if(action==='notifications'){global.location.href='app.html?view=notifications';}
       if(action==='restart'){sessionStorage.removeItem('ap:onboarded');global.location.href='index.html?preview=1';}
       if(action==='logout'){
