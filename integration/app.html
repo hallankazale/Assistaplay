@@ -65,6 +65,7 @@
       const view=params.get('view');
       if(view==='wallet')window.AssistaPay.walletUI.render(container);
       else if(view==='profile')window.AssistaPay.profileUI.render(container);
+      else if(view==='showcase')window.AssistaPay.affiliateShowcase.renderPage(container);
       else if(view==='create'){
         window.AssistaPay.createUI.render(container);
         window.AssistaPay.affiliateShowcase?.mount(container);
