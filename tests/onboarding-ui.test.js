@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const html=fs.readFileSync(path.join(__dirname,'..','integration','index.html'),'utf8');
+const js=fs.readFileSync(path.join(__dirname,'..','src','modules','onboarding','onboarding.ui.js'),'utf8');
+assert.ok(html.includes('onboarding.ui.js'));
+assert.ok(js.includes('apSignupForm'));
+assert.ok(js.includes('apLoginForm'));
+assert.ok(js.includes('signUp'));
+assert.ok(js.includes('signIn'));
+assert.ok(js.includes('feed.html'));
+console.log('Onboarding UI tests: OK');

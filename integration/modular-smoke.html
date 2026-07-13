@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AssistaPay — Teste Modular</title>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#090b10;color:#fff;margin:0;padding:24px}
+    main{max-width:760px;margin:auto}
+    .card{background:#121722;border:1px solid #263044;border-radius:18px;padding:20px;margin-bottom:14px}
+    .ok{color:#00ff9f}.error{color:#ff6b88}pre{white-space:pre-wrap;word-break:break-word;color:#b9c6da}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>AssistaPay — Teste da nova arquitetura</h1>
+    <div class="card">
+      <h2 id="status">Carregando...</h2>
+      <pre id="details"></pre>
+    </div>
+  </main>
+
+  <script src="../src/core/config.js"></script>
+  <script src="../src/core/storage.js"></script>
+  <script src="../src/core/permissions.js"></script>
+  <script src="../src/core/auth.js"></script>
+  <script src="../src/core/migrations.js"></script>
+  <script src="../src/core/database.js"></script>
+  <script src="../src/core/events.js"></script>
+  <script src="../src/core/features.js"></script>
+  <script src="../src/core/router.js"></script>
+  <script src="../src/core/engine.js"></script>
+  <script src="../src/core/logger.js"></script>
+  <script src="../src/bootstrap.js"></script>
+  <script>
+    const result = window.AssistaPay.bootstrap.startCompatibilityMode();
+    const status = document.getElementById('status');
+    const details = document.getElementById('details');
+
+    status.textContent = result.started
+      ? 'Arquitetura modular carregada com sucesso'
+      : 'Falha ao carregar a arquitetura';
+    status.className = result.started ? 'ok' : 'error';
+    details.textContent = JSON.stringify({
+      bootstrap: result,
+      engine: window.AssistaPay.engine.status(),
+      features: window.AssistaPay.features.snapshot(),
+      databaseCollections: Object.keys(window.AssistaPay.database.read())
+    }, null, 2);
+  </script>
+</body>
+</html>

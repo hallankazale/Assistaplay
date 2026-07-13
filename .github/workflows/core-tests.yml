@@ -1,0 +1,62 @@
+name: AssistaPay Core Tests
+
+on:
+  push:
+    branches:
+      - main
+      - 'refactor/**'
+      - 'feature/**'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  core-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Verificar sintaxe do app atual
+        run: node --check app.js
+
+      - name: Verificar sintaxe dos módulos
+        run: |
+          find src -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      - name: Executar testes centrais
+        run: node tests/core-smoke.test.js
+
+      - name: Validar integração modular
+        run: node tests/integration-order.test.js
+
+      - name: Testar sessão e autenticação
+        run: node tests/auth-module.test.js
+
+      - name: Testar fluxo inicial
+        run: node tests/onboarding-ui.test.js
+
+      - name: Testar perfil
+        run: node tests/profile-module.test.js
+
+      - name: Testar recomendação e recompensas
+        run: node tests/engines.test.js
+
+      - name: Testar carteira e antifraude
+        run: node tests/wallet-antifraud.test.js
+
+      - name: Testar produtos pedidos e afiliados
+        run: node tests/commerce-modules.test.js
+
+      - name: Validar preview do feed
+        run: node tests/feed-preview.test.js
