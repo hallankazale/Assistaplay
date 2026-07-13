@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../src/styles/onboarding.css">
   <link rel="stylesheet" href="../src/styles/app-pages.css">
   <link rel="stylesheet" href="../src/styles/shop-affiliate.css">
+  <link rel="stylesheet" href="../src/styles/checkout.css">
   <link rel="stylesheet" href="../src/styles/wallet.css">
   <link rel="stylesheet" href="../src/styles/profile.css">
   <link rel="stylesheet" href="../src/styles/public-profile.css">
@@ -48,6 +49,7 @@
   <script src="../src/modules/messages/messages.store.js"></script>
   <script src="../src/modules/messages/messages.ui.js"></script>
   <script src="../src/modules/navigation/pages.ui.js"></script>
+  <script src="../src/modules/checkout/checkout.ui.js"></script>
   <script src="../src/modules/navigation/bottom-nav.js"></script>
   <script>
     window.AssistaPay.engine.start();
@@ -64,11 +66,15 @@
       else if(view==='seller-center')window.AssistaPay.sellerCenterUI.render(container);
       else if(view==='notifications')window.AssistaPay.notificationsUI.render(container);
       else if(view==='messages')window.AssistaPay.messagesUI.render(container);
+      else if(view==='checkout')window.AssistaPay.checkoutUI.render(container);
       else if(view==='search'){
         window.AssistaPay.searchUI.render(container);
         const userId=params.get('user');
         if(userId)window.AssistaPay.publicProfile?.open(userId);
-      }else window.AssistaPay.pagesUI.render(container);
+      }else{
+        window.AssistaPay.pagesUI.render(container);
+        window.AssistaPay.checkoutUI?.enhance(container);
+      }
       window.AssistaPay.bottomNav?.sync(container);
     }
   </script>
