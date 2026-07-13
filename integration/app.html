@@ -47,6 +47,7 @@
   <script src="../src/modules/messages/messages.store.js"></script>
   <script src="../src/modules/messages/messages.ui.js"></script>
   <script src="../src/modules/navigation/pages.ui.js"></script>
+  <script src="../src/modules/navigation/bottom-nav.js"></script>
   <script>
     window.AssistaPay.engine.start();
     const session=window.AssistaPay.engine.get('session');
@@ -67,6 +68,7 @@
         const userId=params.get('user');
         if(userId)window.AssistaPay.publicProfile?.open(userId);
       }else window.AssistaPay.pagesUI.render(container);
+      window.AssistaPay.bottomNav?.sync(container);
     }
   </script>
 </body>
