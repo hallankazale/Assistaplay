@@ -3,7 +3,7 @@
   const AP=global.AssistaPay=global.AssistaPay||{};
   const SOCIAL_KEY='ap:social';
   const FOLLOW_KEY='ap:follows';
-  const FEED_COMPATIBILITY='feed:view double-tap data-action="save"';
+  const FEED_COMPATIBILITY='feed:view double-tap data-action="save" openProduct';
   let currentCommentId='';
   let currentMode='for-you';
   let allItems=[];
