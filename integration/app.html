@@ -6,13 +6,16 @@
   <title>AssistaPay</title>
   <script>
     (function(){
-      var target='app-main.html'+window.location.search+window.location.hash;
+      var base='/Assistaplay/integration/app-main.html';
+      var target=base+window.location.search+window.location.hash;
       window.location.replace(target);
     })();
   </script>
 </head>
 <body>
-  <p>Abrindo o AssistaPay… <a id="continueLink" href="app-main.html">Continuar</a></p>
-  <script>document.getElementById('continueLink').href='app-main.html'+window.location.search+window.location.hash;</script>
+  <p>Abrindo o AssistaPay… <a id="continueLink" href="/Assistaplay/integration/app-main.html">Continuar</a></p>
+  <script>
+    document.getElementById('continueLink').href='/Assistaplay/integration/app-main.html'+window.location.search+window.location.hash;
+  </script>
 </body>
 </html>
