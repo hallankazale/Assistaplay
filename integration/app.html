@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="../src/styles/public-profile.css">
   <link rel="stylesheet" href="../src/styles/create.css">
   <link rel="stylesheet" href="../src/styles/seller-center.css">
+  <link rel="stylesheet" href="../src/styles/seller-commerce.css?v=9dc8b518">
   <link rel="stylesheet" href="../src/styles/search.css">
   <link rel="stylesheet" href="../src/styles/notifications.css">
   <link rel="stylesheet" href="../src/styles/messages.css">
@@ -46,6 +47,7 @@
   <script src="../src/modules/profile/public-profile.js"></script>
   <script src="../src/modules/create/create.ui.js"></script>
   <script src="../src/modules/seller/seller-center.ui.js"></script>
+  <script src="../src/modules/seller/seller-commerce.ui.js?v=fd8636a5"></script>
   <script src="../src/modules/search/search.store.js"></script>
   <script src="../src/modules/search/search.service.js"></script>
   <script src="../src/modules/search/search.ui.js"></script>
@@ -75,7 +77,7 @@
         renderResult=window.AssistaPay.createUI.render(container);
         window.AssistaPay.affiliateShowcase?.mount(container);
       }
-      else if(view==='seller-center')renderResult=window.AssistaPay.sellerCenterUI.render(container);
+      else if(view==='seller-center')renderResult=window.AssistaPay.sellerCommerceUI.render(container);
       else if(view==='notifications')renderResult=window.AssistaPay.notificationsUI.render(container);
       else if(view==='messages')renderResult=window.AssistaPay.messagesUI.render(container);
       else if(view==='checkout')renderResult=window.AssistaPay.checkoutUI.render(container);
