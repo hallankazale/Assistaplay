@@ -1,0 +1,1 @@
+(function(g){'use strict';const AP=g.AssistaPay=g.AssistaPay||{};AP.logger=Object.freeze({info:(...a)=>console.info('[AssistaPay]',...a),warn:(...a)=>console.warn('[AssistaPay]',...a),error:(...a)=>console.error('[AssistaPay]',...a)});})(window);
