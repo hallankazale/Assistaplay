@@ -22,13 +22,7 @@ Este arquivo é o mapa vivo do projeto. Deve ser lido antes de qualquer nova alt
 - `app.html` → abre `integration/app-main.html` preservando query string e hash
 - `integration/app.html` → redirecionamento de compatibilidade para `integration/app-main.html`
 
-Parâmetros obrigatórios a preservar:
-
-- `view`
-- `tab`
-- `product`
-- `user`
-- parâmetros de cache/versionamento
+Parâmetros obrigatórios a preservar: `view`, `tab`, `product`, `user` e parâmetros de cache/versionamento.
 
 ## Arquivos principais ativos
 
@@ -61,18 +55,64 @@ Parâmetros obrigatórios a preservar:
 ### Estilos
 
 - `src/styles/consolidated.css`: base visual consolidada
-- `src/styles/visual-refresh.css`: camada de cores e refinamento atual
+- `src/styles/color-refresh.css`: camada de cores anterior
+- `src/styles/design-system.css`: tokens oficiais, tipografia, espaçamento, superfícies, botões e componentes-base
+- `src/styles/feed-premium.css`: aplicação visual exclusiva do feed; não altera lógica
 
 ## Estado funcional confirmado
 
 - O feed oficial abre pela URL principal.
-- O deploy automático voltou a funcionar pela branch `main`.
+- O deploy automático funciona pela branch `main`.
 - O feed carrega e a navegação básica funciona.
-- O visual voltou parcialmente após a camada `visual-refresh.css`.
-- Ainda falta reconstruir o design completo que existia antes.
+- A lógica do feed permaneceu congelada durante a criação do Design System.
+
+## Entrega visual atual — Design System + Feed
+
+Data: 14/07/2026
+
+Objetivo:
+
+- criar o Design System oficial;
+- aplicar a primeira entrega somente ao feed;
+- preservar rotas, armazenamento, autenticação e lógica do feed.
+
+Arquivos criados:
+
+- `src/styles/design-system.css`
+- `src/styles/feed-premium.css`
+
+Arquivo alterado:
+
+- `integration/feed-preview.html`
+
+Commits:
+
+- `a609184ab31cbafa5de01dc389d00447169e5962` — Design System
+- `e7cd950e2b2505ac9891c15954aecbadc7fd0fe8` — visual premium do feed
+- `0ea5fbbd7980f72b07368d420652ed8bcab793a4` — conexão dos estilos à entrada oficial
+
+URL de teste:
+
+- `https://hallankazale.github.io/Assistaplay/?v=0ea5fbbd`
+
+Status:
+
+- aguardando deploy verde e validação visual do Hallan;
+- não declarar a etapa concluída antes do teste real.
+
+O que deve ser validado:
+
+- vídeo ocupa corretamente a área útil;
+- barra inferior permanece fixa e legível;
+- botão central possui gradiente;
+- nome, descrição e produto ficam legíveis;
+- botões laterais não poluem a tela;
+- rolagem e reprodução continuam funcionando;
+- links Pesquisar, Criar, Mensagens e Perfil permanecem corretos.
 
 ## Estado funcional ainda não validado por completo
 
+- Design System no feed
 - Perfil completo
 - Centro do Vendedor unificado
 - Pedidos
@@ -96,7 +136,7 @@ Essas áreas não devem ser declaradas concluídas até teste real na URL públi
 4. A regra antiga autorizava somente `refactor/estrutura-profissional-v2`.
 5. A branch `main` foi autorizada e o deploy passou a concluir com sucesso.
 6. A página principal foi ajustada para abrir o feed.
-7. O CSS consolidado era mínimo; foi adicionada a camada `visual-refresh.css`.
+7. O CSS consolidado era mínimo; foram adicionadas camadas visuais sem alterar a lógica.
 
 ## Regra de design a partir deste ponto
 
@@ -113,46 +153,33 @@ Não alterar durante a fase visual:
 - sincronização comercial;
 - estrutura do GitHub Pages.
 
-A fase visual deverá trabalhar por camadas e em pequenas entregas:
+Ordem da fase visual:
 
-1. Design System
-2. Feed
-3. Perfil
-4. Marketplace
-5. Centro do Vendedor
-6. Checkout
-7. Mensagens, notificações e carteira
+1. Design System + Feed
+2. Perfil
+3. Marketplace
+4. Centro do Vendedor
+5. Checkout
+6. Mensagens, notificações e carteira
 
 Cada etapa deve ser testada antes da próxima.
 
 ## Próxima ação registrada
 
-Criar o Design System oficial sem substituir a lógica atual.
+Aguardar o deploy do commit `0ea5fbbd7980f72b07368d420652ed8bcab793a4` e validar a URL pública.
 
-Primeira entrega visual:
+Somente após aprovação do feed:
 
-- definir tokens de cor;
-- tipografia;
-- espaçamento;
-- botões;
-- cartões;
-- navegação inferior;
-- ícones e estados;
-- aplicar primeiro somente ao feed;
-- publicar e validar antes de alterar o perfil.
-
-## Últimos commits de documentação
-
-- `9d1c9cf4606e62132209e43be986aadbbd701431` — reforço das regras permanentes
-- commit deste arquivo — registro do estado atual
+- registrar o resultado do teste;
+- aplicar o Design System ao perfil, sem alterar lógica.
 
 ## Checklist antes de qualquer próxima mudança
 
-- [ ] Leu `PROJECT_RULES.md`
-- [ ] Leu `PROJECT_STATE.md`
-- [ ] Confirmou branch `main`
-- [ ] Confirmou arquivos oficiais
-- [ ] Confirmou último deploy
-- [ ] Definiu alteração pequena
-- [ ] Preservou parâmetros e rotas
-- [ ] Registrou commit e teste
+- [x] Leu `PROJECT_RULES.md`
+- [x] Leu `PROJECT_STATE.md`
+- [x] Confirmou branch `main`
+- [x] Confirmou arquivos oficiais
+- [ ] Confirmou deploy verde desta entrega
+- [x] Definiu alteração pequena
+- [x] Preservou parâmetros e rotas
+- [x] Registrou commits e URL de teste
