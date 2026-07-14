@@ -1,0 +1,1 @@
+(function(g){'use strict';const AP=g.AssistaPay=g.AssistaPay||{};AP.config=Object.freeze({appName:'AssistaPay',version:'consolidation-2',environment:'development',storagePrefix:'ap:',routes:{feed:'feed.html',app:'app.html'}});})(window);
