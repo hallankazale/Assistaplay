@@ -1,0 +1,1 @@
+(function(w){const A=w.AssistaPay=w.AssistaPay||{};A.sellerCenterUI={render:c=>A.sellerCommerceUI?.render?.(c)};})(window);
