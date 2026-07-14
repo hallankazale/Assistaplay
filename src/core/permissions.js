@@ -1,0 +1,1 @@
+(function(g){'use strict';const AP=g.AssistaPay=g.AssistaPay||{};AP.permissions=Object.freeze({can:()=>true,require:()=>true});})(window);
