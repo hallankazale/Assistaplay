@@ -1,0 +1,1 @@
+(function(g){'use strict';const AP=g.AssistaPay=g.AssistaPay||{};AP.migrations=Object.freeze({run(){return true;}});})(window);
