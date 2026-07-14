@@ -1,0 +1,1 @@
+(function(g){'use strict';const AP=g.AssistaPay=g.AssistaPay||{};const bus=new EventTarget();AP.events=Object.freeze({on:(n,h)=>bus.addEventListener(n,h),off:(n,h)=>bus.removeEventListener(n,h),emit:(n,d)=>bus.dispatchEvent(new CustomEvent(n,{detail:d}))});})(window);
