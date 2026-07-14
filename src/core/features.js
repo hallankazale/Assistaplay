@@ -1,0 +1,1 @@
+(function(g){'use strict';const AP=g.AssistaPay=g.AssistaPay||{};const flags={stories:true,marketplace:true,affiliates:true,sellerCenter:true};AP.features=Object.freeze({isEnabled:n=>flags[n]!==false,all:()=>({...flags})});})(window);
