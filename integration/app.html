@@ -59,6 +59,7 @@
   <script src="../src/modules/affiliates/affiliate-showcase.js"></script>
   <script src="../src/modules/affiliate/development-affiliate-sync.js"></script>
   <script src="../src/modules/checkout/checkout.ui.js"></script>
+  <script src="../src/modules/commerce/commerce-sync.js?v=2cdeff66"></script>
   <script src="../src/modules/navigation/bottom-nav.js"></script>
   <script>
     window.AssistaPay.engine.start();
@@ -90,7 +91,10 @@
         window.AssistaPay.checkoutUI?.enhance(container);
       }
       window.AssistaPay.bottomNav?.sync(container);
-      Promise.resolve(renderResult).finally(()=>window.AssistaPay.avatarStory?.rebuild?.());
+      Promise.resolve(renderResult).finally(()=>{
+        window.AssistaPay.avatarStory?.rebuild?.();
+        window.AssistaPay.commerceSync?.sync?.();
+      });
     }
   </script>
 </body>
