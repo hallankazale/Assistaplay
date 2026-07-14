@@ -1,0 +1,1 @@
+(function(g){'use strict';const AP=g.AssistaPay=g.AssistaPay||{};AP.database=Object.freeze({get:(k,f=null)=>AP.storage?.read?.(k,f),set:(k,v)=>AP.storage?.write?.(k,v),remove:k=>AP.storage?.remove?.(k)});})(window);
