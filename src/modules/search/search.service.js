@@ -1,0 +1,1 @@
+(function(g){'use strict';const AP=g.AssistaPay=g.AssistaPay||{};function find(q=''){const term=String(q).trim().toLowerCase();if(!term)return AP.searchStore?.users?.()||[];return (AP.searchStore?.users?.()||[]).filter(u=>`${u.name||''} ${u.username||''}`.toLowerCase().includes(term));}AP.searchService=Object.freeze({find});})(window);
