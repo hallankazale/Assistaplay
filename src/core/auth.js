@@ -1,0 +1,1 @@
+(function(g){'use strict';const AP=g.AssistaPay=g.AssistaPay||{};const KEY='ap:session';const current=()=>AP.storage?.read?.(KEY,null)||null;AP.auth=Object.freeze({current,isAuthenticated:()=>!!current(),login:user=>AP.storage?.write?.(KEY,user),logout:()=>AP.storage?.remove?.(KEY)});})(window);
