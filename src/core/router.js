@@ -1,0 +1,1 @@
+(function(g){'use strict';const AP=g.AssistaPay=g.AssistaPay||{};AP.router=Object.freeze({go(view,params={}){const u=new URL('app.html',location.href);if(view)u.searchParams.set('view',view);Object.entries(params).forEach(([k,v])=>v!=null&&u.searchParams.set(k,v));location.href=u.href;},params:()=>new URLSearchParams(location.search)});})(window);
