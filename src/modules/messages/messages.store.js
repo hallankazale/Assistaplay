@@ -1,0 +1,1 @@
+(function(g){'use strict';const AP=g.AssistaPay=g.AssistaPay||{};const KEY='messages';const all=()=>AP.storage?.get?.(KEY,[])||[];const add=m=>{const rows=all();const item={id:'msg_'+Date.now(),createdAt:new Date().toISOString(),...m};rows.push(item);AP.storage?.set?.(KEY,rows);return item;};AP.messagesStore=Object.freeze({all,add});})(window);
