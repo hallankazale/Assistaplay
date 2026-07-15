@@ -1,21 +1,24 @@
-(function(g){
+(function(global){
 'use strict';
-const AP=g.AssistaPay=g.AssistaPay||{};
-const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-function creatorProducts(id){
-  const products=AP.pagesUI?.getProducts?.()||[];
-  return products.filter(product=>product.status!=='paused'&&String(product.sellerId||product.ownerId||product.userId||product.advertiserId||'')===String(id));
-}
-function open(id){
-  const user=(AP.searchStore?.users?.()||[]).find(u=>String(u.id)===String(id));
-  if(!user)return false;
-  const host=document.getElementById('appPage');
-  if(!host)return false;
-  const products=creatorProducts(id);
-  const storeButton=products.length?`<a class="ap-primary-btn" href="app.html?view=shop&seller=${encodeURIComponent(id)}&sellerName=${encodeURIComponent(user.name||'Criador')}">🛍 Ver loja (${products.length})</a>`:'';
-  host.innerHTML=`<main class="ap-page"><header class="ap-page-header"><a href="app.html?view=search">‹</a><h1>Perfil</h1></header><section style="padding:24px;text-align:center">${user.avatar?`<img src="${esc(user.avatar)}" style="width:96px;height:96px;border-radius:50%;object-fit:cover">`:'<div style="font-size:64px">👤</div>'}<h2>${esc(user.name)}</h2><p>@${esc(user.username||'usuario')}</p><div style="display:grid;grid-template-columns:${products.length?'1fr 1fr':'1fr'};gap:10px;max-width:360px;margin:18px auto"><button id="apFollowPublic" class="ap-primary-btn">Seguir</button>${storeButton}</div></section></main>`;
-  host.querySelector('#apFollowPublic')?.addEventListener('click',e=>{const ids=AP.storage?.get?.('following',[])||[];if(!ids.includes(user.id))ids.push(user.id);AP.storage?.set?.('following',ids);e.currentTarget.textContent='Seguindo';});
-  return true;
-}
+const AP=global.AssistaPay=global.AssistaPay||{};
+const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+const read=(key,fallback)=>AP.storage?.get?.(key,fallback)??fallback;
+const write=(key,value)=>AP.storage?.set?.(key,value);
+const money=value=>Number(value||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+function productsFor(id){return (AP.pagesUI?.getProducts?.()||[]).filter(product=>product.status!=='paused'&&product.status!=='deleted'&&String(product.sellerId||product.ownerId||product.userId||product.advertiserId||'')===String(id));}
+async function postsFor(id){try{return (await AP.publicationStore?.listPublished?.()||[]).filter(post=>String(post.authorId||post.userId||'')===String(id)&&post.status!=='deleted');}catch{return [];}}
+function verified(user){return user?.sellerVerified===true||user?.verifiedSeller===true||user?.sellerStatus==='verified'||user?.verificationStatus==='verified';}
+function initials(name){return String(name||'AP').trim().split(/\s+/).slice(0,2).map(part=>part[0]).join('').toUpperCase()||'AP';}
+function avatar(user){return user.avatar?`<img src="${esc(user.avatar)}" alt="Foto de ${esc(user.name||'criador')}">`:`<span>${esc(initials(user.name))}</span>`;}
+function postCard(post){const media=post.mediaBlob||post.media||post.videoUrl||post.image||'';if(!media)return '<div class="ap-public-tile ap-public-empty-tile">▶</div>';const safe=esc(media);return String(post.mediaType||post.type||'').includes('image')?`<div class="ap-public-tile"><img src="${safe}" alt=""></div>`:`<div class="ap-public-tile"><video src="${safe}" muted playsinline preload="metadata"></video><b>▶</b></div>`;}
+function productCard(product){const name=product.name||product.title||'Produto';return `<a class="ap-public-product" href="app.html?view=product&product=${encodeURIComponent(product.id||'')}"><div>${product.image?`<img src="${esc(product.image)}" alt="${esc(name)}">`:'<span>🛍</span>'}</div><strong>${esc(name)}</strong><small>${money(product.price)}</small></a>`;}
+async function fill(host,user,tab,products){const grid=host.querySelector('[data-public-grid]');if(!grid)return;if(tab==='shop'){grid.className='ap-public-products';grid.innerHTML=products.length?products.map(productCard).join(''):'<div class="ap-public-empty"><strong>Loja sem produtos</strong><span>Este criador ainda não publicou produtos.</span></div>';return;}grid.className='ap-public-grid';const posts=await postsFor(user.id);grid.innerHTML=posts.length?posts.map(postCard).join(''):'<div class="ap-public-empty"><strong>Nenhuma publicação</strong><span>Os vídeos deste criador aparecerão aqui.</span></div>';}
+async function share(user){const url=location.href;try{if(navigator.share)await navigator.share({title:user.name||'Perfil AssistaPay',url});else await navigator.clipboard?.writeText?.(url);}catch{}}
+function open(id){const user=(AP.searchStore?.users?.()||[]).find(item=>String(item.id)===String(id));if(!user)return false;const host=document.getElementById('appPage');if(!host)return false;const products=productsFor(id);const following=read('following',[]);const isFollowing=following.some(value=>String(value)===String(id));const followerCount=Number(user.followers||0)+(isFollowing?1:0);host.innerHTML=`<main class="ap-public-profile"><header class="ap-public-header"><a href="app.html?view=search" aria-label="Voltar">‹</a><strong>${esc(user.name||'Perfil')}</strong><button type="button" data-public-share aria-label="Compartilhar">↗</button></header><section class="ap-public-hero"><div class="ap-public-avatar">${avatar(user)}</div><h1>${esc(user.name||'Criador')}</h1><p>@${esc(String(user.username||'usuario').replace(/^@/,''))}</p>${verified(user)?'<div class="ap-verified-seller">✓ Vendedor Verificado</div>':''}<div class="ap-public-stats"><div><strong>${Number(user.following||0)}</strong><span>Seguindo</span></div><div><strong data-public-followers>${followerCount}</strong><span>Seguidores</span></div><div><strong>${Number(user.likes||0)}</strong><span>Curtidas</span></div></div><div class="ap-public-actions"><button class="ap-public-follow${isFollowing?' active':''}" type="button" data-public-follow>${isFollowing?'Seguindo':'Seguir'}</button><a href="app.html?view=messages&user=${encodeURIComponent(id)}">Mensagem</a><button type="button" data-public-more aria-label="Mais opções">⌄</button></div>${user.bio?`<p class="ap-public-bio">${esc(user.bio)}</p>`:''}${user.link?`<a class="ap-public-link" href="${esc(user.link)}" target="_blank" rel="noopener">🔗 ${esc(user.link)}</a>`:''}</section><nav class="ap-public-tabs"><button class="active" type="button" data-public-tab="posts">▦</button>${products.length?'<button type="button" data-public-tab="shop">🛍</button>':''}</nav><section data-public-grid></section></main>`;
+const followButton=host.querySelector('[data-public-follow]');followButton?.addEventListener('click',()=>{let ids=read('following',[]).map(String);const active=ids.includes(String(id));ids=active?ids.filter(value=>value!==String(id)):[...ids,String(id)];write('following',ids);followButton.classList.toggle('active',!active);followButton.textContent=!active?'Seguindo':'Seguir';const count=host.querySelector('[data-public-followers]');if(count)count.textContent=Number(user.followers||0)+(!active?1:0);});
+host.querySelector('[data-public-share]')?.addEventListener('click',()=>share(user));
+host.querySelector('[data-public-more]')?.addEventListener('click',()=>alert('Mais opções do perfil estarão disponíveis em breve.'));
+host.querySelectorAll('[data-public-tab]').forEach(button=>button.addEventListener('click',()=>{host.querySelectorAll('[data-public-tab]').forEach(item=>item.classList.toggle('active',item===button));fill(host,user,button.dataset.publicTab,products);}));
+fill(host,user,'posts',products);return true;}
 AP.publicProfile=Object.freeze({open});
 })(window);
