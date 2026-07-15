@@ -5,11 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#09090d">
   <title>AssistaPay</title>
-  <link rel="stylesheet" href="../src/styles/consolidated.css?v=marketplace-restore-1">
-  <link rel="stylesheet" href="../src/styles/design-system.css?v=marketplace-restore-1">
-  <link rel="stylesheet" href="../src/styles/color-refresh.css?v=marketplace-restore-1">
-  <link rel="stylesheet" href="../src/styles/profile-premium.css?v=marketplace-restore-1">
-  <link rel="stylesheet" href="../src/styles/marketplace-premium.css?v=marketplace-restore-1">
+  <link rel="stylesheet" href="../src/styles/consolidated.css?v=product-detail-1">
+  <link rel="stylesheet" href="../src/styles/design-system.css?v=product-detail-1">
+  <link rel="stylesheet" href="../src/styles/color-refresh.css?v=product-detail-1">
+  <link rel="stylesheet" href="../src/styles/profile-premium.css?v=product-detail-1">
+  <link rel="stylesheet" href="../src/styles/marketplace-premium.css?v=product-detail-1">
+  <link rel="stylesheet" href="../src/styles/product-detail.css?v=c41903e2">
 </head>
 <body>
   <div id="appPage"></div>
@@ -45,10 +46,11 @@
   <script src="../src/modules/notifications/notifications.ui.js"></script>
   <script src="../src/modules/messages/messages.store.js"></script>
   <script src="../src/modules/messages/messages.ui.js"></script>
-  <script src="../src/modules/navigation/pages.ui.js?v=66eee195"></script>
+  <script src="../src/modules/navigation/pages.ui.js?v=3cebc813"></script>
+  <script src="../src/modules/products/product-detail.ui.js?v=73e00f32"></script>
   <script src="../src/modules/affiliates/affiliate-showcase.js"></script>
   <script src="../src/modules/affiliate/development-affiliate-sync.js"></script>
-  <script src="../src/modules/checkout/checkout.ui.js"></script>
+  <script src="../src/modules/checkout/checkout.ui.js?v=d4f93c94"></script>
   <script src="../src/modules/commerce/commerce-sync.js?v=creator-store-1"></script>
   <script src="../src/modules/navigation/bottom-nav.js?v=290c4961"></script>
   <script>
@@ -70,6 +72,7 @@
         else if(view==='seller-center')result=AP.sellerCommerceUI?.render?.(container);
         else if(view==='notifications')result=AP.notificationsUI?.render?.(container);
         else if(view==='messages')result=AP.messagesUI?.render?.(container);
+        else if(view==='product')result=AP.productDetailUI?.render?.(container);
         else if(view==='checkout')result=AP.checkoutUI?.render?.(container);
         else if(view==='search'){
           result=AP.searchUI?.render?.(container);
@@ -79,7 +82,7 @@
           result=AP.pagesUI?.render?.(container);
           AP.checkoutUI?.enhance?.(container);
         }
-        AP.bottomNav?.sync?.(container);
+        if(view!=='product')AP.bottomNav?.sync?.(container);
         Promise.resolve(result).finally(()=>{
           AP.avatarStory?.rebuild?.();
           AP.commerceSync?.sync?.();
