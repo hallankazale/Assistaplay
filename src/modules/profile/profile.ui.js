@@ -1,46 +1,16 @@
 (function(global){
 'use strict';
 const AP=global.AssistaPay=global.AssistaPay||{};
-function profile(){
-  const saved=AP.storage?.get?.('profile',{})||AP.storage?.read?.('profile',{})||{};
-  const user=AP.session?.user?.()||{};
-  return {
-    name:saved.name||user.name||'Usuário AssistaPay',
-    username:saved.username||user.username||'@usuario',
-    bio:saved.bio||'Criador no AssistaPay',
-    followers:Number(saved.followers||user.followers||0),
-    following:Number(saved.following||user.following||0),
-    likes:Number(saved.likes||user.likes||0)
-  };
-}
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const readProfile=()=>AP.storage?.get?.('profile',{})||AP.storage?.read?.('profile',{})||{};
+const writeProfile=v=>AP.storage?.set?.('profile',v)||AP.storage?.write?.('profile',v);
+function profile(){const saved=readProfile(),user=AP.session?.user?.()||{};return{name:saved.name||user.name||'Usuário AssistaPay',username:saved.username||user.username||'@usuario',bio:saved.bio||'Criador no AssistaPay',followers:Number(saved.followers||user.followers||0),following:Number(saved.following||user.following||0),likes:Number(saved.likes||user.likes||0)};}
 function initials(name){return String(name||'AP').trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'AP';}
-function render(container){
-  const p=profile();
-  container.innerHTML=`<main class="ap-profile-page">
-    <header class="ap-profile-header"><a href="../feed.html" aria-label="Voltar">‹</a><h1>Perfil</h1><button type="button" aria-label="Mais opções">⋯</button></header>
-    <section class="ap-profile-hero">
-      <div class="ap-profile-avatar-lg">${initials(p.name)}</div>
-      <h2 class="ap-profile-name">${p.name}</h2>
-      <p class="ap-profile-username">${p.username}</p>
-      <p class="ap-profile-bio">${p.bio}</p>
-    </section>
-    <section class="ap-profile-stats">
-      <div class="ap-profile-stat"><strong>${p.following}</strong><span>Seguindo</span></div>
-      <div class="ap-profile-stat"><strong>${p.followers}</strong><span>Seguidores</span></div>
-      <div class="ap-profile-stat"><strong>${p.likes}</strong><span>Curtidas</span></div>
-    </section>
-    <section class="ap-profile-actions">
-      <a class="primary" href="app.html?view=profile-edit">Editar perfil</a>
-      <a class="secondary" href="app.html?view=showcase">Minha vitrine</a>
-    </section>
-    <section class="ap-profile-menu">
-      <a href="app.html?view=showcase"><span class="icon">🛍</span><span><strong>Minha Vitrine</strong><small>Produtos e indicações</small></span><em>›</em></a>
-      <a href="app.html?view=seller-center"><span class="icon">▦</span><span><strong>Centro do Vendedor</strong><small>Vendas, comissões e produtos</small></span><em>›</em></a>
-      <a href="app.html?view=wallet"><span class="icon">◈</span><span><strong>Carteira</strong><small>Saldo e movimentações</small></span><em>›</em></a>
-    </section>
-    <nav class="ap-profile-tabs" aria-label="Conteúdo do perfil"><button class="active" type="button">Vídeos</button><button type="button">Salvos</button><button type="button">Curtidos</button></nav>
-    <section class="ap-profile-grid" aria-label="Publicações"><div>▶</div><div>▶</div><div>▶</div></section>
-  </main>`;
-}
+async function publications(){try{return await AP.publicationStore?.listPublished?.()||[];}catch{return [];}}
+function gridItem(item){const media=item?.mediaBlob||item?.media||item?.videoUrl||item?.image||'';if(media){const safe=esc(media);return String(item.mediaType||item.type||'').includes('image')?`<div class="ap-profile-media"><img src="${safe}" alt=""></div>`:`<div class="ap-profile-media"><video src="${safe}" muted playsinline preload="metadata"></video><span>▶</span></div>`;}return '<div class="ap-profile-media ap-profile-placeholder">▶</div>';}
+async function fillGrid(container,tab){const grid=container.querySelector('.ap-profile-grid');if(!grid)return;const all=await publications();const user=AP.session?.user?.()||{};const own=all.filter(x=>!user.id||String(x.authorId||x.userId||'')===String(user.id));let rows=own;if(tab==='saved'){const ids=AP.profileFavorites?.all?.()||[];rows=all.filter(x=>ids.includes(String(x.id)));}if(tab==='liked'){let liked={};try{liked=JSON.parse(localStorage.getItem('ap:feed-likes')||'{}')}catch{}rows=all.filter(x=>liked[x.id]);}grid.innerHTML=rows.length?rows.map(gridItem).join(''):`<div class="ap-profile-empty"><strong>Nenhum item</strong><span>Aqui aparecerão seus ${tab==='saved'?'salvos':tab==='liked'?'curtidos':'vídeos'}.</span></div>`;}
+function editSheet(container,p){const old=document.getElementById('apProfileEdit');if(old)old.remove();const sheet=document.createElement('section');sheet.id='apProfileEdit';sheet.className='ap-profile-edit-sheet open';sheet.innerHTML=`<div class="ap-profile-edit-backdrop" data-close></div><form class="ap-profile-edit-card"><header><strong>Editar perfil</strong><button type="button" data-close>×</button></header><label>Nome<input name="name" maxlength="50" value="${esc(p.name)}" required></label><label>Usuário<input name="username" maxlength="30" value="${esc(p.username)}" required></label><label>Bio<textarea name="bio" maxlength="160">${esc(p.bio)}</textarea></label><button class="ap-profile-save" type="submit">Salvar alterações</button></form>`;document.body.appendChild(sheet);sheet.addEventListener('click',e=>{if(e.target.closest('[data-close]'))sheet.remove();});sheet.querySelector('form').addEventListener('submit',e=>{e.preventDefault();const data=new FormData(e.currentTarget);const current=readProfile();writeProfile({...current,name:String(data.get('name')).trim(),username:String(data.get('username')).trim(),bio:String(data.get('bio')).trim()});sheet.remove();render(container);});}
+async function shareProfile(){const url=location.href;try{if(navigator.share)await navigator.share({title:'Meu perfil no AssistaPay',url});else if(navigator.clipboard)await navigator.clipboard.writeText(url);}catch{}}
+function render(container){const p=profile();container.innerHTML=`<main class="ap-profile-page"><header class="ap-profile-header"><a href="../feed.html" aria-label="Voltar">‹</a><h1>Perfil</h1><button type="button" data-share-profile aria-label="Compartilhar perfil">↗</button></header><section class="ap-profile-hero"><div class="ap-profile-avatar-lg">${esc(initials(p.name))}</div><h2 class="ap-profile-name">${esc(p.name)}</h2><p class="ap-profile-username">${esc(p.username)}</p><p class="ap-profile-bio">${esc(p.bio)}</p></section><section class="ap-profile-stats"><div class="ap-profile-stat"><strong>${p.following}</strong><span>Seguindo</span></div><div class="ap-profile-stat"><strong>${p.followers}</strong><span>Seguidores</span></div><div class="ap-profile-stat"><strong>${p.likes}</strong><span>Curtidas</span></div></section><section class="ap-profile-actions"><button class="primary" type="button" data-edit-profile>Editar perfil</button><a class="secondary" href="app.html?view=showcase">Minha vitrine</a></section><section class="ap-profile-menu"><a href="app.html?view=showcase"><span class="icon">🛍</span><span><strong>Minha Vitrine</strong><small>Produtos e indicações</small></span><em>›</em></a><a href="app.html?view=seller-center"><span class="icon">▦</span><span><strong>Centro do Vendedor</strong><small>Vendas, comissões e produtos</small></span><em>›</em></a><a href="app.html?view=wallet"><span class="icon">◈</span><span><strong>Carteira</strong><small>Saldo e movimentações</small></span><em>›</em></a></section><nav class="ap-profile-tabs"><button class="active" data-tab="videos" type="button">Vídeos</button><button data-tab="saved" type="button">Salvos</button><button data-tab="liked" type="button">Curtidos</button></nav><section class="ap-profile-grid" aria-label="Conteúdo do perfil"></section></main>`;container.addEventListener('click',e=>{const tab=e.target.closest('[data-tab]');if(tab){container.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b===tab));fillGrid(container,tab.dataset.tab);return;}if(e.target.closest('[data-edit-profile]'))editSheet(container,profile());if(e.target.closest('[data-share-profile]'))shareProfile();},{once:false});fillGrid(container,'videos');}
 AP.profileUI=Object.freeze({render,profile});
 })(window);
