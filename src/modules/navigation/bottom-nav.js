@@ -5,15 +5,15 @@ function current(){return new URLSearchParams(location.search).get('view')||'hom
 function markup(){
   const view=current();
   const item=(href,label,icon,key,extra='')=>`<a href="${href}" class="${view===key?'active':''} ${extra}" data-bottom-view="${key}"><span>${icon}</span><small>${label}</small></a>`;
-  return `<nav class="ap-page-nav ap-bottom-nav" aria-label="Menu principal">
+  return `<nav class="ap-page-nav ap-bottom-nav ap-bottom-nav-six" aria-label="Menu principal">
     ${item('../feed.html','Feed','⌂','home')}
     ${item('app.html?view=search','Buscar','⌕','search')}
-    ${item('app.html?view=create','','+','create','create')}
     ${item('app.html?view=shop','Loja','🛍','shop')}
+    ${item('app.html?view=create','','+','create','create ap-create-centered')}
     ${item('app.html?view=messages','Mensagens','✉','messages')}
     ${item('app.html?view=profile','Perfil','♙','profile')}
   </nav>`;
 }
-function sync(container=document.body){if(!container)return null;let nav=container.querySelector('.ap-bottom-nav,.ap-page-nav');if(!nav){container.insertAdjacentHTML('beforeend',markup());nav=container.querySelector('.ap-bottom-nav,.ap-page-nav');}nav.querySelectorAll('[data-bottom-view]').forEach(a=>a.classList.toggle('active',a.dataset.bottomView===current()));return nav;}
+function sync(container=document.body){if(!container)return null;let nav=container.querySelector('.ap-bottom-nav,.ap-page-nav');if(!nav){container.insertAdjacentHTML('beforeend',markup());nav=container.querySelector('.ap-bottom-nav,.ap-page-nav');}nav.classList.add('ap-bottom-nav-six');nav.querySelectorAll('[data-bottom-view]').forEach(a=>a.classList.toggle('active',a.dataset.bottomView===current()));return nav;}
 AP.bottomNav=Object.freeze({sync,markup});
 })(window);
