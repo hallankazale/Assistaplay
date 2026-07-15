@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#05060a">
   <title>AssistaPay — Para você</title>
-  <link rel="stylesheet" href="../src/styles/consolidated.css?v=save-visual-1">
-  <link rel="stylesheet" href="../src/styles/design-system.css?v=save-visual-1">
-  <link rel="stylesheet" href="../src/styles/color-refresh.css?v=save-visual-1">
-  <link rel="stylesheet" href="../src/styles/feed-premium.css?v=save-visual-1">
-  <link rel="stylesheet" href="../src/styles/feed-comments.css?v=31135300">
-  <link rel="stylesheet" href="../src/styles/feed-save-visual.css?v=2dc7d03e">
+  <link rel="stylesheet" href="../src/styles/consolidated.css?v=feed-unfreeze-1">
+  <link rel="stylesheet" href="../src/styles/design-system.css?v=feed-unfreeze-1">
+  <link rel="stylesheet" href="../src/styles/color-refresh.css?v=feed-unfreeze-1">
+  <link rel="stylesheet" href="../src/styles/feed-premium.css?v=feed-unfreeze-1">
+  <link rel="stylesheet" href="../src/styles/feed-comments.css?v=feed-unfreeze-1">
+  <link rel="stylesheet" href="../src/styles/feed-save-visual.css?v=feed-unfreeze-1">
 </head>
 <body>
   <div class="ap-app-shell">
@@ -40,23 +40,26 @@
   <script src="../src/modules/stories/story-lifecycle.js"></script>
   <script src="../src/modules/stories/story.service.js"></script>
   <script src="../src/modules/avatar/avatar-story.js"></script>
-  <script src="../src/modules/profile/profile-favorites.js?v=save-visual-1"></script>
-  <script src="../src/modules/feed/feed-comments-v3.js?v=0a900581"></script>
-  <script src="../src/modules/feed/feed.ui.js?v=save-visual-1"></script>
-  <script src="../src/modules/feed/feed-save-visual.js?v=1a18561b"></script>
+  <script src="../src/modules/profile/profile-favorites.js?v=feed-unfreeze-1"></script>
+  <script src="../src/modules/feed/feed-comments-v3.js?v=feed-unfreeze-1"></script>
+  <script src="../src/modules/feed/feed.ui.js?v=feed-unfreeze-1"></script>
+  <script src="../src/modules/feed/feed-save-visual.js?v=595b4a8e"></script>
   <script>
     (function(){
       const AP=window.AssistaPay||{};
       const host=document.getElementById('feed');
       try{
         AP.engine?.start?.();
-        Promise.resolve(AP.feedUI?.render?.(host)).finally(()=>{
+        Promise.resolve(AP.feedUI?.render?.(host)).then(()=>{
           AP.feedSaveVisual?.apply?.(host);
           AP.avatarStory?.rebuild?.();
+        }).catch(error=>{
+          console.error(error);
+          host.innerHTML='<section class="ap-feed-empty"><div><h1>AssistaPay</h1><p>Não foi possível carregar o feed.</p></div></section>';
         });
       }catch(error){
         console.error(error);
-        host.innerHTML='<section class="ap-empty"><h1>AssistaPay</h1><p>Não foi possível carregar o feed.</p></section>';
+        host.innerHTML='<section class="ap-feed-empty"><div><h1>AssistaPay</h1><p>Não foi possível carregar o feed.</p></div></section>';
       }
     })();
   </script>
