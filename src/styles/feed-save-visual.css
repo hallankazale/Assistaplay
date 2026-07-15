@@ -1,0 +1,1 @@
+.ap-feed-actions [data-save]{filter:grayscale(1);opacity:.58;transition:filter .18s ease,opacity .18s ease,transform .18s ease}.ap-feed-actions [data-save].is-saved,.ap-feed-actions [data-save][aria-pressed="true"]{filter:none;opacity:1;transform:scale(1.04);box-shadow:0 0 0 1px rgba(255,214,10,.35),0 10px 24px rgba(0,0,0,.45)!important}
