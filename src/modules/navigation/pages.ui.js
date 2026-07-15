@@ -1,112 +1,27 @@
 (function(global){
 'use strict';
-
 const AP=global.AssistaPay=global.AssistaPay||{};
-
-const read=(key,fallback=[])=>{
-  try{
-    const value=JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback));
-    return value==null?fallback:value;
-  }catch{
-    return fallback;
-  }
-};
-
-const money=value=>Number(value||0).toLocaleString('pt-BR',{
-  style:'currency',
-  currency:'BRL'
-});
-
-const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,char=>({
-  '&':'&amp;',
-  '<':'&lt;',
-  '>':'&gt;',
-  '"':'&quot;',
-  "'":'&#39;'
-}[char]));
-
+const read=(key,fallback=[])=>{try{const value=JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback));return value==null?fallback:value;}catch{return fallback;}};
+const money=value=>Number(value||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 function getProducts(){
-  const sellerProducts=read('ap:seller-products',[]);
-  if(Array.isArray(sellerProducts)&&sellerProducts.length)return sellerProducts;
-
-  try{
-    const legacy=JSON.parse(localStorage.getItem('assistapay_db_v3_shop')||'null');
-    if(Array.isArray(legacy?.products)){
-      return legacy.products.map(product=>({
-        id:product.id,
-        name:product.name,
-        title:product.name,
-        description:product.desc||'',
-        price:Number(product.price||0),
-        stock:Number(product.stock||0),
-        commission:Number(product.commissionPercent||0),
-        status:product.status||'active',
-        image:product.image||'',
-        seller:product.seller||'Loja AssistaPay'
-      }));
-    }
-  }catch{}
-
-  return [];
+ const sellerProducts=read('ap:seller-products',[]);
+ if(Array.isArray(sellerProducts)&&sellerProducts.length)return sellerProducts;
+ try{const legacy=JSON.parse(localStorage.getItem('assistapay_db_v3_shop')||'null');if(Array.isArray(legacy?.products))return legacy.products.map(product=>({id:product.id,name:product.name,title:product.name,description:product.desc||'',price:Number(product.price||0),stock:Number(product.stock||0),commission:Number(product.commissionPercent||0),status:product.status||'active',image:product.image||'',seller:product.seller||'Loja AssistaPay',category:product.category||'Destaques'}));}catch{}
+ return [];
 }
-
-function navigation(){
-  return `<nav class="ap-page-nav" aria-label="Menu principal">
-    <a href="../feed.html"><span>⌂</span><small>Início</small></a>
-    <a href="app-main.html?view=shop"><span>▱</span><small>Shop</small></a>
-    <a href="app-main.html?view=create" class="create"><span>+</span><small>Criar</small></a>
-    <a href="app-main.html?view=messages"><span>✉</span><small>Mensagens</small></a>
-    <a href="app-main.html?view=profile"><span>♙</span><small>Perfil</small></a>
-  </nav>`;
-}
-
-function home(container){
-  container.innerHTML=`<main class="ap-page">
-    <header class="ap-page-header"><h1>AssistaPay</h1></header>
-    <section class="ap-page-section">
-      <h2>Escolha uma área</h2>
-      <div class="ap-menu-list">
-        <a href="../feed.html">Feed</a>
-        <a href="app-main.html?view=shop">Shop</a>
-        <a href="app-main.html?view=showcase">Minha Vitrine</a>
-        <a href="app-main.html?view=seller-center">Centro do Vendedor</a>
-        <a href="app-main.html?view=wallet">Carteira</a>
-        <a href="app-main.html?view=profile">Perfil</a>
-      </div>
-    </section>
-  </main>${navigation()}`;
-}
-
+function navigation(){return `<nav class="ap-page-nav" aria-label="Menu principal"><a href="../feed.html"><span>⌂</span><small>Início</small></a><a class="active" href="app-main.html?view=shop"><span>▱</span><small>Shop</small></a><a href="app-main.html?view=create" class="create"><span>+</span><small>Criar</small></a><a href="app-main.html?view=messages"><span>✉</span><small>Mensagens</small></a><a href="app-main.html?view=profile"><span>♙</span><small>Perfil</small></a></nav>`;}
+function home(container){container.innerHTML=`<main class="ap-page"><header class="ap-page-header"><h1>AssistaPay</h1></header><section class="ap-page-section"><h2>Escolha uma área</h2><div class="ap-menu-list"><a href="../feed.html">Feed</a><a href="app-main.html?view=shop">Shop</a><a href="app-main.html?view=showcase">Minha Vitrine</a><a href="app-main.html?view=seller-center">Centro do Vendedor</a><a href="app-main.html?view=wallet">Carteira</a><a href="app-main.html?view=profile">Perfil</a></div></section></main>${navigation()}`;}
+function productCard(product){const name=product.name||product.title||'Produto';return `<article class="ap-market-card" data-product-card data-search="${escapeHtml((name+' '+(product.description||'')+' '+(product.seller||'')).toLowerCase())}" data-category="${escapeHtml(product.category||'Destaques')}"><div class="ap-market-media">${product.image?`<img src="${escapeHtml(product.image)}" alt="${escapeHtml(name)}">`:'<div class="ap-market-placeholder">🛍</div>'}${Number(product.commission||0)>0?`<span class="ap-market-badge">${Number(product.commission)}% comissão</span>`:''}</div><div class="ap-market-card-body"><h3>${escapeHtml(name)}</h3><span class="ap-market-seller">${escapeHtml(product.seller||'Loja AssistaPay')}</span><div class="ap-market-price"><strong>${money(product.price)}</strong><span class="ap-market-stock">${Number(product.stock||0)>0?`${Number(product.stock)} disponíveis`:'Sem estoque'}</span></div><a href="app-main.html?view=checkout&product=${encodeURIComponent(product.id||'')}">Ver produto</a></div></article>`;}
 function shop(container){
-  const products=getProducts().filter(product=>product.status!=='paused');
-  container.innerHTML=`<main class="ap-page">
-    <header class="ap-page-header"><a href="app-main.html">‹</a><h1>Shop</h1></header>
-    <section class="ap-page-section">
-      <div class="ap-product-grid">
-        ${products.length?products.map(product=>`<article class="ap-product-card" data-product-id="${escapeHtml(product.id)}">
-          ${product.image?`<img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name||product.title||'Produto')}">`:''}
-          <div><strong>${escapeHtml(product.name||product.title||'Produto')}</strong>
-          <small>${money(product.price)}</small>
-          <p>Estoque: ${Number(product.stock||0)}</p>
-          <a href="app-main.html?view=checkout&product=${encodeURIComponent(product.id||'')}">Ver produto</a></div>
-        </article>`).join(''):'<div class="ap-empty-state"><h2>Nenhum produto disponível</h2><p>Cadastre um produto no Centro do Vendedor.</p><a href="app-main.html?view=seller-center">Abrir Centro do Vendedor</a></div>'}
-      </div>
-    </section>
-  </main>${navigation()}`;
+ const products=getProducts().filter(product=>product.status!=='paused'&&product.status!=='deleted');
+ const categories=['Todos',...new Set(products.map(x=>x.category||'Destaques'))];
+ container.innerHTML=`<main class="ap-market-page"><header class="ap-market-header"><div class="ap-market-top"><a href="app-main.html" aria-label="Voltar">‹</a><h1>Marketplace</h1><a href="app-main.html?view=profile" aria-label="Perfil">♙</a></div><label class="ap-market-search"><span>⌕</span><input type="search" placeholder="Buscar produtos, lojas e categorias" data-market-search><button type="button" data-market-clear aria-label="Limpar">×</button></label></header><nav class="ap-market-chips" aria-label="Categorias">${categories.map((category,index)=>`<button class="ap-market-chip${index===0?' active':''}" type="button" data-category-filter="${escapeHtml(category)}">${escapeHtml(category)}</button>`).join('')}</nav><section class="ap-market-section"><header><div><h2>Produtos para você</h2><small data-market-count>${products.length} produto${products.length===1?'':'s'}</small></div></header><div class="ap-market-grid" data-market-grid>${products.length?products.map(productCard).join(''):'<div class="ap-market-empty"><strong>Nenhum produto disponível</strong><span>Cadastre o primeiro produto no Centro do Vendedor.</span><a href="app-main.html?view=seller-center">Abrir Centro do Vendedor</a></div>'}</div></section></main>${navigation()}`;
+ const search=container.querySelector('[data-market-search]');let active='Todos';
+ const apply=()=>{const term=String(search?.value||'').trim().toLowerCase();let visible=0;container.querySelectorAll('[data-product-card]').forEach(card=>{const matchesText=!term||card.dataset.search.includes(term);const matchesCategory=active==='Todos'||card.dataset.category===active;const show=matchesText&&matchesCategory;card.hidden=!show;if(show)visible++;});const count=container.querySelector('[data-market-count]');if(count)count.textContent=`${visible} produto${visible===1?'':'s'}`;};
+ search?.addEventListener('input',apply);container.querySelector('[data-market-clear]')?.addEventListener('click',()=>{if(search){search.value='';search.focus();apply();}});container.querySelectorAll('[data-category-filter]').forEach(button=>button.addEventListener('click',()=>{active=button.dataset.categoryFilter;container.querySelectorAll('[data-category-filter]').forEach(x=>x.classList.toggle('active',x===button));apply();}));
 }
-
-function render(container){
-  if(!container)throw new Error('pagesUI.render requer um container.');
-  const view=new URLSearchParams(global.location.search).get('view');
-  if(view==='shop'||view==='products')return shop(container);
-  return home(container);
-}
-
-AP.pagesUI=Object.freeze({
-  render,
-  products:getProducts(),
-  getProducts
-});
-
+function render(container){if(!container)throw new Error('pagesUI.render requer um container.');const view=new URLSearchParams(global.location.search).get('view');if(view==='shop'||view==='products'||view==='marketplace')return shop(container);return home(container);}
+AP.pagesUI=Object.freeze({render,products:getProducts(),getProducts});
 try{AP.engine?.register?.('pagesUI',AP.pagesUI);}catch{}
 })(window);
