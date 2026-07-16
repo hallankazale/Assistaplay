@@ -5,16 +5,17 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#09090d">
   <title>AssistaPay</title>
-  <link rel="stylesheet" href="../src/styles/consolidated.css?v=stories-premium-1">
-  <link rel="stylesheet" href="../src/styles/design-system.css?v=stories-premium-1">
-  <link rel="stylesheet" href="../src/styles/color-refresh.css?v=stories-premium-1">
-  <link rel="stylesheet" href="../src/styles/profile-premium.css?v=stories-premium-1">
-  <link rel="stylesheet" href="../src/styles/public-profile-assistapay.css?v=stories-premium-1">
-  <link rel="stylesheet" href="../src/styles/marketplace-premium.css?v=stories-premium-1">
-  <link rel="stylesheet" href="../src/styles/product-detail.css?v=stories-premium-1">
-  <link rel="stylesheet" href="../src/styles/bottom-nav-centered.css?v=stories-premium-1">
-  <link rel="stylesheet" href="../src/styles/story-history.css?v=stories-premium-1">
-  <link rel="stylesheet" href="../src/styles/story-premium.css?v=b48e680b">
+  <link rel="stylesheet" href="../src/styles/consolidated.css?v=create-camera-1">
+  <link rel="stylesheet" href="../src/styles/design-system.css?v=create-camera-1">
+  <link rel="stylesheet" href="../src/styles/color-refresh.css?v=create-camera-1">
+  <link rel="stylesheet" href="../src/styles/profile-premium.css?v=create-camera-1">
+  <link rel="stylesheet" href="../src/styles/public-profile-assistapay.css?v=create-camera-1">
+  <link rel="stylesheet" href="../src/styles/marketplace-premium.css?v=create-camera-1">
+  <link rel="stylesheet" href="../src/styles/product-detail.css?v=create-camera-1">
+  <link rel="stylesheet" href="../src/styles/bottom-nav-centered.css?v=create-camera-1">
+  <link rel="stylesheet" href="../src/styles/story-history.css?v=create-camera-1">
+  <link rel="stylesheet" href="../src/styles/story-premium.css?v=create-camera-1">
+  <link rel="stylesheet" href="../src/styles/create-camera.css?v=617fe2f6">
 </head>
 <body>
   <div id="appPage"></div>
@@ -29,20 +30,20 @@
   <script src="../src/core/router.js"></script>
   <script src="../src/core/engine.js"></script>
   <script src="../src/core/logger.js"></script>
-  <script src="../src/modules/system/account-history.js?v=stories-premium-1"></script>
+  <script src="../src/modules/system/account-history.js?v=create-camera-1"></script>
   <script src="../src/modules/session/session.module.js"></script>
   <script src="../src/modules/auth/auth.module.js"></script>
   <script src="../src/modules/publications/publication.store.js"></script>
-  <script src="../src/modules/stories/story-archive.js?v=stories-premium-1"></script>
+  <script src="../src/modules/stories/story-archive.js?v=create-camera-1"></script>
   <script src="../src/modules/stories/story-lifecycle.js"></script>
-  <script src="../src/modules/stories/story.service.js?v=34f7633c"></script>
-  <script src="../src/modules/avatar/avatar-story.js?v=b6ea1ebd"></script>
+  <script src="../src/modules/stories/story.service.js?v=create-camera-1"></script>
+  <script src="../src/modules/avatar/avatar-story.js?v=create-camera-1"></script>
   <script src="../src/modules/wallet/wallet.ui.js"></script>
-  <script src="../src/modules/profile/profile.ui.js?v=stories-premium-1"></script>
+  <script src="../src/modules/profile/profile.ui.js?v=create-camera-1"></script>
   <script src="../src/modules/profile/profile-favorites.js"></script>
-  <script src="../src/modules/profile/public-profile.js?v=stories-premium-1"></script>
-  <script src="../src/modules/settings/settings.ui.js?v=stories-premium-1"></script>
-  <script src="../src/modules/create/create.ui.js?v=stories-premium-1"></script>
+  <script src="../src/modules/profile/public-profile.js?v=create-camera-1"></script>
+  <script src="../src/modules/settings/settings.ui.js?v=create-camera-1"></script>
+  <script src="../src/modules/create/create.ui.js?v=a7f58325"></script>
   <script src="../src/modules/seller/seller-center.ui.js"></script>
   <script src="../src/modules/seller/seller-center-links.js?v=creator-store-1"></script>
   <script src="../src/modules/seller/seller-commerce.ui.js?v=creator-store-1"></script>
@@ -74,10 +75,7 @@
         else if(view==='settings')result=AP.settingsUI?.render?.(container);
         else if(view==='account-history')result=AP.settingsUI?.renderHistory?.(container);
         else if(view==='showcase')result=AP.affiliateShowcase?.renderPage?.(container);
-        else if(view==='create'){
-          result=AP.createUI?.render?.(container);
-          AP.affiliateShowcase?.mount?.(container);
-        }
+        else if(view==='create')result=AP.createUI?.render?.(container);
         else if(view==='seller-center')result=AP.sellerCommerceUI?.render?.(container);
         else if(view==='notifications')result=AP.notificationsUI?.render?.(container);
         else if(view==='messages')result=AP.messagesUI?.render?.(container);
@@ -91,7 +89,7 @@
           result=AP.pagesUI?.render?.(container);
           AP.checkoutUI?.enhance?.(container);
         }
-        if(!['product','settings','account-history'].includes(view))AP.bottomNav?.sync?.(container);
+        if(!['product','settings','account-history','create'].includes(view))AP.bottomNav?.sync?.(container);
         Promise.resolve(result).finally(()=>{
           AP.avatarStory?.rebuild?.();
           AP.commerceSync?.sync?.();
