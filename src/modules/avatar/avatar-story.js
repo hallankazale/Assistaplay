@@ -3,88 +3,22 @@
 const AP=global.AssistaPay=global.AssistaPay||{};
 if(global.__apUnifiedAvatarStory)return;
 global.__apUnifiedAvatarStory=true;
-let objectUrl='';
 let refreshTimer=0;
-const SELECTORS=[
-  '.ap-avatar-button','[data-profile-avatar]','.ap-message-avatar',
-  '.ap-notification-avatar','.ap-search-avatar','.ap-public-avatar',
-  '.ap-user-avatar','.ap-video-slide .ap-avatar',
-  '[data-author-id] img[data-avatar]','[data-user-id] img[data-avatar]'
-].join(',');
-function candidates(root=document){
-  const list=[];
-  if(root.nodeType===1&&root.matches?.(SELECTORS))list.push(root);
-  root.querySelectorAll?.(SELECTORS).forEach(el=>list.push(el));
-  return [...new Set(list)];
-}
-function targetFor(el){
-  if(!el.matches('img'))return el;
-  return el.closest('.ap-avatar-button,[data-profile-avatar],button,a')||el;
-}
-function apply(root=document){
-  candidates(root).forEach(raw=>{
-    const el=targetFor(raw);
-    const story=AP.storyService?.find?.(el)||AP.storyService?.find?.(raw)||null;
-    el._apStory=story;
-    el.classList.toggle('ap-avatar-has-story',!!story);
-    el.classList.toggle('ap-story-ring',!!story);
-    el.classList.toggle('has-story',!!story);
-    el.setAttribute('aria-label',story?'Ver story':'Abrir perfil');
-  });
-}
-async function rebuild(){
-  await AP.storyService?.rebuild?.();
-  apply(document);
-  requestAnimationFrame(()=>apply(document));
-  setTimeout(()=>apply(document),120);
-  setTimeout(()=>apply(document),600);
-  setTimeout(()=>apply(document),1600);
-}
-function scheduleRebuild(){
-  clearTimeout(refreshTimer);
-  refreshTimer=setTimeout(()=>rebuild().catch(()=>{}),40);
-}
-function close(){
-  const viewer=document.getElementById('apUnifiedStoryViewer');
-  viewer?.querySelector('video')?.pause();
-  viewer?.remove();
-}
-function open(story){
-  if(!story)return false;
-  close();
-  let src=story.media||story.url||'';
-  if(!src&&story.mediaBlob){
-    if(objectUrl)URL.revokeObjectURL(objectUrl);
-    objectUrl=URL.createObjectURL(story.mediaBlob);
-    src=objectUrl;
-  }
-  if(!src)return false;
-  const video=String(story.mediaType||'').startsWith('video/');
-  const viewer=document.createElement('div');
-  viewer.id='apUnifiedStoryViewer';
-  viewer.className='ap-unified-story-viewer';
-  viewer.innerHTML=`<div class="ap-unified-story-progress"><i></i></div><button type="button" aria-label="Fechar">×</button>${video?`<video src="${src}" playsinline autoplay controls></video>`:`<img src="${src}" alt="Story">`}`;
-  viewer.querySelector('button').onclick=close;
-  document.body.appendChild(viewer);
-  if(video)viewer.querySelector('video').addEventListener('ended',close,{once:true});
-  else setTimeout(close,7000);
-  return true;
-}
-document.addEventListener('click',event=>{
-  const el=event.target.closest('.ap-avatar-has-story,.ap-story-ring');
-  if(!el)return;
-  const story=el._apStory||AP.storyService?.find?.(el);
-  if(!story||!open(story))return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-},true);
-const observer=new MutationObserver(scheduleRebuild);
-observer.observe(document.documentElement,{childList:true,subtree:true});
-global.addEventListener('storage',scheduleRebuild);
-global.addEventListener('pageshow',scheduleRebuild);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleRebuild();});
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scheduleRebuild);
-else scheduleRebuild();
-setInterval(scheduleRebuild,60000);
-AP.avatarStory=Object.freeze({rebuild,apply,open});
+const SELECTORS=['.ap-avatar-button','[data-profile-avatar]','.ap-message-avatar','.ap-notification-avatar','.ap-search-avatar','.ap-public-avatar','.ap-user-avatar','.ap-video-slide .ap-avatar','.ap-profile-avatar-wrap','[data-author-id] img[data-avatar]','[data-user-id] img[data-avatar]'].join(',');
+function candidates(root=document){const list=[];if(root.nodeType===1&&root.matches?.(SELECTORS))list.push(root);root.querySelectorAll?.(SELECTORS).forEach(element=>list.push(element));return [...new Set(list)];}
+function targetFor(element){if(!element.matches('img'))return element;return element.closest('.ap-avatar-button,[data-profile-avatar],button,a')||element;}
+function apply(root=document){candidates(root).forEach(raw=>{const element=targetFor(raw);const story=AP.storyService?.find?.(element)||AP.storyService?.find?.(raw)||null;element._apStory=story;element.classList.toggle('ap-avatar-has-story',!!story);element.classList.toggle('ap-story-ring',!!story);element.classList.toggle('has-story',!!story);element.setAttribute('aria-label',story?'Ver story':'Abrir perfil');});}
+async function rebuild(){await AP.storyService?.rebuild?.();apply(document);requestAnimationFrame(()=>apply(document));setTimeout(()=>apply(document),150);setTimeout(()=>apply(document),700);}
+function scheduleRebuild(){clearTimeout(refreshTimer);refreshTimer=setTimeout(()=>rebuild().catch(()=>{}),50);}
+function close(){const viewer=document.getElementById('apUnifiedStoryViewer');viewer?.querySelector('video')?.pause();viewer?._cleanup?.();viewer?.remove();}
+function open(initialStory){if(!initialStory)return false;close();const authorKey=initialStory.authorId||initialStory.username||initialStory.creator;const items=AP.storyService?.byAuthor?.(authorKey)||[initialStory];let index=Math.max(0,items.findIndex(item=>String(item.id)===String(initialStory.id)));const viewer=document.createElement('div');viewer.id='apUnifiedStoryViewer';viewer.className='ap-unified-story-viewer';let timer=0,started=0,remaining=7000,paused=false,startY=0;
+function clearTimer(){clearTimeout(timer);timer=0;}
+function go(nextIndex){if(nextIndex<0)return;if(nextIndex>=items.length){close();return;}index=nextIndex;render();}
+function render(){clearTimer();const story=items[index];const source=story.media||story.mediaBlob||story.url||'';const video=String(story.mediaType||'').startsWith('video/');remaining=video?60000:7000;viewer.innerHTML=`<div class="ap-story-progress">${items.map((_,itemIndex)=>`<span><i style="width:${itemIndex<index?'100%':'0%'}"></i></span>`).join('')}</div><header><strong>${story.creator||story.authorName||story.username||'Story'}</strong><small>${new Date(story.createdAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</small><button type="button" data-close aria-label="Fechar">×</button></header><button class="ap-story-hit left" type="button" data-prev aria-label="Story anterior"></button><button class="ap-story-hit right" type="button" data-next aria-label="Próximo story"></button>${video?`<video src="${source}" playsinline autoplay></video>`:`<img src="${source}" alt="Story">`}<footer><a href="../app.html?view=messages&user=${encodeURIComponent(story.authorId||'')}">Responder</a></footer>`;viewer.querySelector('[data-close]').onclick=close;viewer.querySelector('[data-prev]').onclick=()=>go(index-1);viewer.querySelector('[data-next]').onclick=()=>go(index+1);const media=viewer.querySelector('video,img');const bar=viewer.querySelectorAll('.ap-story-progress i')[index];started=performance.now();paused=false;if(video){const element=viewer.querySelector('video');element.onloadedmetadata=()=>{remaining=Math.min(60000,Math.max(1000,(element.duration||7)*1000));startProgress(bar,remaining);};element.onended=()=>go(index+1);}else startProgress(bar,remaining);media?.addEventListener('pointerdown',pause);media?.addEventListener('pointerup',resume);media?.addEventListener('pointercancel',resume);}
+function startProgress(bar,duration){bar.style.transition='none';bar.style.width='0%';requestAnimationFrame(()=>{bar.style.transition=`width ${duration}ms linear`;bar.style.width='100%';});started=performance.now();clearTimer();timer=setTimeout(()=>go(index+1),duration);}
+function pause(){if(paused)return;paused=true;const elapsed=performance.now()-started;remaining=Math.max(0,remaining-elapsed);clearTimer();const bar=viewer.querySelectorAll('.ap-story-progress i')[index];if(bar){const width=getComputedStyle(bar).width;bar.style.transition='none';bar.style.width=width;}viewer.querySelector('video')?.pause();}
+function resume(){if(!paused)return;paused=false;const bar=viewer.querySelectorAll('.ap-story-progress i')[index];viewer.querySelector('video')?.play().catch(()=>{});startProgress(bar,remaining);}
+viewer.addEventListener('touchstart',event=>{startY=event.touches[0]?.clientY||0;},{passive:true});viewer.addEventListener('touchend',event=>{const endY=event.changedTouches[0]?.clientY||0;if(endY-startY>90)close();},{passive:true});viewer._cleanup=()=>clearTimer();document.body.appendChild(viewer);render();AP.accountHistory?.record?.('story.viewed',{label:'Story visualizado',details:String(initialStory.creator||initialStory.username||'')});return true;}
+document.addEventListener('click',event=>{const element=event.target.closest('.ap-avatar-has-story,.ap-story-ring');if(!element)return;const story=element._apStory||AP.storyService?.find?.(element);if(!story||!open(story))return;event.preventDefault();event.stopImmediatePropagation();},true);
+const observer=new MutationObserver(scheduleRebuild);observer.observe(document.documentElement,{childList:true,subtree:true});global.addEventListener('storage',scheduleRebuild);global.addEventListener('pageshow',scheduleRebuild);document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleRebuild();});if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scheduleRebuild);else scheduleRebuild();setInterval(scheduleRebuild,60000);AP.avatarStory=Object.freeze({rebuild,apply,open});
 })(window);
